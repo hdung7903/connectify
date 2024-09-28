@@ -1,11 +1,16 @@
 import { Outlet } from 'react-router-dom'
+import { Helmet, HelmetProvider } from 'react-helmet-async'
 
 function App() {
-
   return (
-    <div>
-      <Outlet />
-    </div>
+    <HelmetProvider>
+      <Helmet>
+        <title>Connectify</title>
+      </Helmet>
+      <div>
+        <Outlet />
+      </div>
+    </HelmetProvider>
   )
 }
 

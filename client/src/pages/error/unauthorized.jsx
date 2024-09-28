@@ -1,9 +1,13 @@
-
-
-function unauthorizedPage() {
+import { Button, Result } from 'antd';
+function UnauthorizedPage() {
   return (
-    <div>unauthorizedPage</div>
+    <Result
+      status="403"
+      title="403"
+      subTitle="Sorry, you are not authorized to access this page."
+      extra={<Button type="primary">Back Home</Button>}
+    />
   )
 }
 
-export default unauthorizedPage
+export default UnauthorizedPage

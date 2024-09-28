@@ -1,43 +1,28 @@
-import { Layout, Menu, Typography } from 'antd';
+import { Layout, Row, Col, Space, Typography } from 'antd';
+import { Link } from "react-router-dom"
 
 const { Header } = Layout;
 const { Title } = Typography;
 
-const items = [
-    {
-        key: 'home',
-        label: 'Home',
-    },
-    {
-        key: 'messages',
-        label: 'Messages',
-    },
-    {
-        key: 'notifications',
-        label: 'Notifications',
-    },
-    {
-        key: 'profile',
-        label: 'Profile',
-    }
-]
-
-const headerStyle = {
-    display: 'flex',
-    alignItems: 'center',
-}
 
 function HeaderComponent() {
     return (
-        <Header style={headerStyle}>
-            <Title level={2} style={{ color: 'white', textAlign:"center" }}>Connectify</Title>
-            <Menu
-                theme="dark"
-                mode="horizontal"
-                defaultSelectedKeys={['1']}
-                items={items}
-                style={{ flex: 1, minWidth: 0 }}
-            />
+        <Header style={{ background: '#fff', padding: '0 50px' }}>
+            <Row justify="space-between" align="middle" style={{ height: '100%' }}>
+                <Col>
+                    <Title level={3} style={{ margin: 0 }}>Connectify</Title>
+                </Col>
+                <Col>
+                    <Space>
+                        <Link to="/register">
+                            Sign Up
+                        </Link>
+                        <Link to="/login">
+                            Log In
+                        </Link>
+                    </Space>
+                </Col>
+            </Row>
         </Header>
     )
 }
