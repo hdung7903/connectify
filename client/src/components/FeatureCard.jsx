@@ -1,5 +1,6 @@
 import { Card, Typography } from "antd";
 import React from "react";
+import PropTypes from 'prop-types';
 
 const { Title, Paragraph } = Typography;
 
@@ -10,3 +11,9 @@ export const FeatureCard = ({ icon, title, description }) => (
         <Paragraph>{description}</Paragraph>
     </Card>
 );
+
+FeatureCard.propTypes = {
+    icon: PropTypes.elementType.isRequired,
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+};

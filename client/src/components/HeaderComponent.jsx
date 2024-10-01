@@ -1,26 +1,49 @@
 import { Layout, Row, Col, Space, Typography } from 'antd';
-import { Link } from "react-router-dom"
-
+import { useNavigate } from "react-router-dom"
+import MyLogo from './MyLogo.jsx';
+import { useEffect, useState } from 'react';
+import DropdownMenu from './HeaderDropdown.jsx';
 const { Header } = Layout;
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 
 function HeaderComponent() {
+    const [auth, setAuth] = useState(localStorage.getItem("auth") === "true");
+    const [username, setUsername] = useState(localStorage.getItem("username"));
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const handleStorageChange = () => {
+            setAuth(localStorage.getItem("auth") === "true");
+            setUsername(localStorage.getItem("username"));
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem("auth");
+        localStorage.removeItem("username");
+        setAuth(false);
+        setUsername(null);
+        navigate('/login');
+    };
+
+
     return (
-        <Header style={{ background: '#fff', padding: '0 50px' }}>
-            <Row justify="space-between" align="middle" style={{ height: '100%' }}>
+        <Header style={{ background: '#4169E1', padding: '0 50px' }}>
+            <Row style={{ width: '100%', height: '100%' }} align="middle" justify="space-between">
                 <Col>
-                    <Title level={3} style={{ margin: 0 }}>Connectify</Title>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <MyLogo />
+                        <Title level={3} style={{ color: '#fff', margin: 0, paddingBottom: 25 }}>Connectify</Title>
+                    </div>
                 </Col>
                 <Col>
-                    <Space>
-                        <Link to="/register">
-                            Sign Up
-                        </Link>
-                        <Link to="/login">
-                            Log In
-                        </Link>
-                    </Space>
+                    {auth && username && (
+                            <DropdownMenu username={username} handleLogout={handleLogout} />
+                    )}
                 </Col>
             </Row>
         </Header>

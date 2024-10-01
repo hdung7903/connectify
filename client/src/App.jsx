@@ -7,7 +7,7 @@ function App() {
       <Helmet>
         <title>Connectify</title>
       </Helmet>
-      <div>
+      <div style={{ minHeight: '100vh' }}>
         <Outlet />
       </div>
     </HelmetProvider>

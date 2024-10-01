@@ -4,7 +4,9 @@ const { Footer } = Layout;
 
 function FooterComponent() {
     return (
-        <Footer className="text-center">
+        <Footer style={{
+            textAlign: 'center',
+        }}>
             Connectify ©{new Date().getFullYear()} Created with Ant Design
         </Footer>
     )
