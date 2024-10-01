@@ -1,0 +1,22 @@
+.home {
+    display: flex;
+    width: 100%;
+}
+
+.left,
+.center,
+.right {
+    padding: 1rem; /* Adjust padding as needed */
+}
+
+.feed .postCard {
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+}
+
+.chatFunction {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    padding-right: 1vw;
+}
