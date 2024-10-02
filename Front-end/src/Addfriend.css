@@ -1,0 +1,16 @@
+.add-friend-container {
+    padding: 20px;
+    text-align: center;
+}
+
+.add-friend-container .ant-input {
+    max-width: 400px;
+}
+
+.add-friend-container .ant-card {
+    text-align: center;
+}
+
+.add-friend-container p {
+    color: #595959;
+}
