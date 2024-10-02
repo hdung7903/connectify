@@ -12,6 +12,7 @@ import AuthLayout from '../pages/auth/layout.jsx';
 import UserLayout from '../pages/user/layout.jsx';
 import ChatPage from '../pages/user/chat.jsx';
 import { Route, Routes } from 'react-router-dom';
+import AddFriend from '../pages/user/friend.jsx';
 
 function AppRoute() {
     return (
@@ -25,6 +26,7 @@ function AppRoute() {
                 <Route index element={<GuestHomePage />} />
                 <Route path="/home" element={<UserHomePage />} />
                 <Route path="/message" element={<ChatPage />} />
+                <Route path="/suggestions" element={<AddFriend />} />
             </Route>
 
             {/* Admin routes */}
