@@ -16,10 +16,8 @@ import {
 } from '@ant-design/icons';
 import '../../style/chat.css';
 
-const { Sider, Content, Header } = Layout;
+const { Sider, Content } = Layout;
 const { Text } = Typography;
-const { TabPane } = Tabs;
-const { Panel } = Collapse;
 
 const chats = [
     {
@@ -88,146 +86,157 @@ const chats = [
 
 function Chat() {
     const [selectedChat, setSelectedChat] = useState(chats[0]);
+    const [isSiderRightVisible, setIsSiderRightVisible] = useState(false);
+
+    const tabItems = [
+        {
+            key: '1',
+            label: 'Inbox',
+            children: (
+                <List
+                    style={{overflowY: 'auto', height: '100%'}}
+                    itemLayout="horizontal"
+                    dataSource={chats}
+                    renderItem={(item) => (
+                        <List.Item
+                            className={`chat-list-item ${item.id === selectedChat.id ? 'active' : ''}`}
+                            onClick={() => setSelectedChat(item)}
+                        >
+                            <List.Item.Meta
+                                avatar={<Avatar src="https://via.placeholder.com/40" />}
+                                title={
+                                    <div className="chat-list-title">
+                                        <span>{item.name}</span>
+                                        {item.active && <span className="chat-status-dot" />}
+                                    </div>
+                                }
+                                description={`${item.message} · ${item.time}`}
+                            />
+                        </List.Item>
+                    )}
+                />
+            ),
+        },
+        {
+            key: '2',
+            label: 'Communities',
+            children: <div>Communities Chat</div>,
+        },
+    ];
+
+    const collapseItems = [
+        {
+            key: '1',
+            label: 'Chat Info',
+            children: <div>Chat Details Information</div>,
+        },
+        {
+            key: '2',
+            label: 'Customize Chat',
+            children: <div>Tùy chọn đoạn chat</div>,
+        },
+        {
+            key: '3',
+            label: 'Media & Files',
+            children: (
+                <div>
+                    <div className="file-item"><PictureOutlined /> File phương tiện</div>
+                    <div className="file-item"><FileTextOutlined /> File</div>
+                </div>
+            ),
+        },
+        {
+            key: '4',
+            label: 'Privacy & support',
+            children: <div>Quyền riêng tư</div>,
+        },
+    ];
+
+    const toggleSiderRight = () => {
+        setIsSiderRightVisible(!isSiderRightVisible);
+    };
 
     return (
-        <Layout style={{ height: '100vh' }}>
-            {/* Sidebar bên trái */}
-            <Sider width="25%" theme="light" className="chat-sider">
+        <Layout className="chat-layout">
+            <Sider width={300} theme="light" className="chat-sider">
                 <div className="chat-header">
-                    <Text strong>Đoạn chat</Text>
-                    <Button icon={<PlusOutlined />} className="chat-add-button" />
+                    <Text strong>Chats</Text>
+                    <Button icon={<PlusOutlined />} type="primary" shape="circle" />
                 </div>
                 <Input
                     placeholder="Tìm kiếm trên Messenger"
                     prefix={<SearchOutlined />}
                     className="chat-search"
                 />
-                <Tabs defaultActiveKey="1" className="chat-tabs">
-                    <TabPane tab="Hộp thư" key="1">
-                        <List
-                            itemLayout="horizontal"
-                            dataSource={chats}
-                            renderItem={(item) => (
-                                <List.Item
-                                    className={`chat-list-item ${item.id === selectedChat.id ? 'active' : ''}`}
-                                    onClick={() => setSelectedChat(item)} // Cập nhật cuộc hội thoại đang được chọn
-                                >
-                                    <List.Item.Meta
-                                        avatar={<Avatar src="https://via.placeholder.com/40" />}
-                                        title={
-                                            <div className="chat-list-title">
-                                                <span>{item.name}</span>
-                                                {item.active && <span className="chat-list-status-dot" />}
-                                            </div>
-                                        }
-                                        description={`${item.message} · ${item.time}`}
-                                    />
-                                </List.Item>
-                            )}
-                        />
-                    </TabPane>
-                    <TabPane tab="Cộng đồng" key="2">
-                        {/* Nội dung cộng đồng */}
-                    </TabPane>
-                </Tabs>
+                <Tabs items={tabItems} className="chat-tabs" />
             </Sider>
 
-            {/* Phần hội thoại chính */}
-            <Layout style={{ width: '50%' }}>
-                <Header className="chat-header-main">
-                    <Avatar src="https://via.placeholder.com/40" size={40} />
+            <Layout>
+                <Layout.Header className="chat-header-main">
+                    <Avatar src={`https://i.pravatar.cc/150?u=${selectedChat.id}`} size={40} />
                     <div className="chat-header-info">
-                        <div className="chat-header-name-status">
-                            <Text strong className="chat-header-name">{selectedChat.name}</Text>
-                            <div className="chat-status-dot"></div>
-                            <Text className="chat-status-text">Đang hoạt động</Text>
+                        <Text strong className="chat-header-name">{selectedChat.name}</Text>
+                        <div className="chat-status">
+                            <span className="chat-status-dot"></span>
+                            <Text type="secondary">Active Now</Text>
                         </div>
                     </div>
                     <div className="chat-header-actions">
-                        <Button icon={<PhoneOutlined />} className="chat-header-button" />
-                        <Button icon={<VideoCameraOutlined />} className="chat-header-button" />
-                        <Button icon={<InfoCircleOutlined />} className="chat-header-button" />
+                        <Button icon={<PhoneOutlined />} shape="circle" />
+                        <Button icon={<VideoCameraOutlined />} shape="circle" />
+                        <Button icon={<InfoCircleOutlined />} shape="circle" onClick={toggleSiderRight} />
                     </div>
-                </Header>
-
-
-                <Content className="chat-content">
-                    {/* Nội dung phần hội thoại */}
+                </Layout.Header>
+                <Content className="chat-content" style={{ overflowY: "auto" }}>
                     <div className="chat-messages">
                         {selectedChat.messages.map((message, index) => (
                             <div key={index} className={`chat-message ${message.sender === 'me' ? 'right' : 'left'}`}>
-                                {message.sender !== 'me' && <Avatar src="https://via.placeholder.com/40" />}
+                                {message.sender !== 'me' && <Avatar src={`https://i.pravatar.cc/150?u=${selectedChat.id}`} />}
                                 <div className={`chat-bubble ${message.sender === 'me' ? 'chat-bubble-right' : ''}`}>
-                                    {message.text}
+                                    {message.text}                                   
                                 </div>
-                                <span className={`chat-time ${message.sender === 'me' ? 'chat-time-right' : ''}`}>
-                                    {message.time}
-                                </span>
+                                <span className="chat-time">{message.time}</span>
                             </div>
                         ))}
                     </div>
-                    {/* Thanh nhập tin nhắn */}
                     <div className="chat-input-container">
-                        <Button icon={<PlusOutlined />} className="chat-input-button" />
-                        <Input className="chat-input" placeholder="Aa" />
-                        <Button icon={<SmileOutlined />} className="chat-input-button" />
-                        <Button icon={<SendOutlined />} className="chat-input-send" />
+                        <Button icon={<PlusOutlined />} shape="circle" />
+                        <Input
+                            className="chat-input"
+                            placeholder="Aa"
+                            suffix={<SmileOutlined style={{ color: 'rgba(0,0,0,.45)' }} />}
+                        />
+                        <Button icon={<SendOutlined />} type="primary" shape="circle" />
                     </div>
                 </Content>
             </Layout>
 
-            {/* Sidebar bên phải */}
-            <Sider width="25%" theme="light" className="chat-sider-right">
-                <div className="chat-sider-content">
-                    <Avatar src="https://via.placeholder.com/80" size={80} className="chat-avatar" />
-                    <div className="chat-user-info">
-                        <Text strong className="chat-user-name">{selectedChat.name}</Text>
-                        <div className="chat-status">
-                            <span className="chat-status-dot"></span>
-                            <Text className="chat-status-text">Đang hoạt động</Text>
-                        </div>
-                    </div>
-                    <div className="chat-encryption-status">
-                        <Button icon={<LockOutlined />} type="text" className="chat-encryption-button">
-                            Được mã hóa đầu cuối
-                        </Button>
-                    </div>
-                    <div className="chat-actions">
-                        <div className="chat-action-item">
-                            <UserOutlined />
-
-                        </div>
-                        <div className="chat-action-item">
-                            <BellOutlined />
-
-                        </div>
-                        <div className="chat-action-item">
-                            <SearchOutlined />
-
-                        </div>
-                    </div>
-
-                    <Collapse defaultActiveKey={['1']} className="chat-collapse">
-                        <Panel header="Thông tin về đoạn chat" key="1">
-                            {/* Nội dung thông tin thêm */}
-                        </Panel>
-                        <Panel header="Tùy chỉnh đoạn chat" key="2">
-                            {/* Tùy chọn đoạn chat */}
-                        </Panel>
-                        <Panel header="File phương tiện & file" key="3">
-                            <div>
-                                <div className="file-item"><PictureOutlined /> File phương tiện</div>
-                                <div className="file-item"><FileTextOutlined /> File</div>
+            {isSiderRightVisible && (
+                <Sider width={300} theme="light" className="chat-sider-right">
+                    <div className="chat-sider-content">
+                        <Avatar src={`https://i.pravatar.cc/150?u=${selectedChat.id}`} size={80} className="chat-avatar" />
+                        <div className="chat-user-info">
+                            <Text strong className="chat-user-name">{selectedChat.name}</Text>
+                            <div className="chat-status">
+                                <span className="chat-status-dot"></span>
+                                <Text type="secondary">Đang hoạt động</Text>
                             </div>
-                        </Panel>
-                        <Panel header="Quyền riêng tư & hỗ trợ" key="4">
-                            {/* Quyền riêng tư */}
-                        </Panel>
-                    </Collapse>
-                </div>
-            </Sider>
+                        </div>
+                        <div className="chat-encryption-status">
+                            <Button icon={<LockOutlined />} type="text">
+                                Được mã hóa đầu cuối
+                            </Button>
+                        </div>
+                        <div className="chat-actions">
+                            <Button icon={<UserOutlined />} shape="circle" />
+                            <Button icon={<BellOutlined />} shape="circle" />
+                            <Button icon={<SearchOutlined />} shape="circle" />
+                        </div>
 
-
+                        <Collapse ghost items={collapseItems} defaultActiveKey={['1']} className="chat-collapse" />
+                    </div>
+                </Sider>
+            )}
         </Layout>
     );
 }

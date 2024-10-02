@@ -1,9 +1,15 @@
-import { DownOutlined, SettingOutlined, UserOutlined, MessageOutlined, LogoutOutlined } from '@ant-design/icons';
+import { SettingOutlined, MessageOutlined, LogoutOutlined } from '@ant-design/icons';
 import { Dropdown, Space, Avatar, Typography } from 'antd';
+import { useNavigate } from 'react-router-dom';
 
 const { Text } = Typography;
 
+
+
 const DropdownMenu = ({ username, handleLogout }) => {
+
+    const navigate = useNavigate();
+
     const items = [
         {
             key: '1',
@@ -23,6 +29,9 @@ const DropdownMenu = ({ username, handleLogout }) => {
             key: '2',
             label: 'Message',
             icon: <MessageOutlined />,
+            onClick: () => {
+                navigate('/message');
+            },
         },
         {
             key: '3',
@@ -39,12 +48,12 @@ const DropdownMenu = ({ username, handleLogout }) => {
     ];
 
     return (
-        <Dropdown menu={{ items }}>        
+        <Dropdown menu={{ items }}>
             <Space align='start' style={{ color: '#fff', cursor: 'pointer', alignItems: 'start', paddingBottom: '28px' }}>
                 <Avatar
                     size={40}
                     src="https://xsgames.co/randomusers/avatar.php?g=male"
-                    style={{alignItems: 'start'}}
+                    style={{ alignItems: 'start' }}
                 />
             </Space>
         </Dropdown>

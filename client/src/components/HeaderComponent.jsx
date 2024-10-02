@@ -3,14 +3,16 @@ import { useNavigate } from "react-router-dom"
 import MyLogo from './MyLogo.jsx';
 import { useEffect, useState } from 'react';
 import DropdownMenu from './HeaderDropdown.jsx';
+import useLoading from '../hooks/useLoading.jsx';
 const { Header } = Layout;
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 
 function HeaderComponent() {
     const [auth, setAuth] = useState(localStorage.getItem("auth") === "true");
     const [username, setUsername] = useState(localStorage.getItem("username"));
     const navigate = useNavigate();
+    const { handleNavigation } = useLoading();
 
     useEffect(() => {
         const handleStorageChange = () => {
@@ -35,14 +37,14 @@ function HeaderComponent() {
         <Header style={{ background: '#4169E1', padding: '0 50px' }}>
             <Row style={{ width: '100%', height: '100%' }} align="middle" justify="space-between">
                 <Col>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => handleNavigation('/home')}>
                         <MyLogo />
                         <Title level={3} style={{ color: '#fff', margin: 0, paddingBottom: 25 }}>Connectify</Title>
                     </div>
                 </Col>
                 <Col>
                     {auth && username && (
-                            <DropdownMenu username={username} handleLogout={handleLogout} />
+                        <DropdownMenu username={username} handleLogout={handleLogout} />
                     )}
                 </Col>
             </Row>

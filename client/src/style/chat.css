@@ -1,10 +1,13 @@
 .chat-sider {
     background: #f0f2f5;
-    overflow-y: auto;
-    height: 100vh;
+    height: 93.3vh;
     border-right: 1px solid #d3d3d3;
     padding: 16px;
     width: 25%;
+}
+
+.chat-layout{
+    height: 93.3vh;
 }
 
 .chat-header {
@@ -82,7 +85,7 @@
     display: flex;
     align-items: center;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    height: 70px;
+    height: 60px;
     border-bottom: 1px solid #d3d3d3;
 }
 
@@ -90,12 +93,14 @@
     margin-left: 12px;
     flex: 1;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    flex-direction: column;
 }
 
 .chat-header-name-status {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    justify-content:flex-start;
     gap: 8px;
 }
 
@@ -120,6 +125,7 @@
 .chat-header-actions {
     display: flex;
     margin-left: auto;
+    gap:8px;
 }
 
 .chat-header-button {
@@ -134,13 +140,14 @@
 
 /* Nội dung hội thoại */
 .chat-content {
-    padding: 16px;
+    padding: 4px;
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 160px);
+    height: calc(100vh - 80px);
     overflow-y: auto;
     background: #ffffff;
     border-right: 1px solid #d3d3d3;
+    flex: 1;
 }
 
 .chat-messages {
@@ -149,6 +156,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    max-height: 100%;
 }
 
 .chat-message {
@@ -307,8 +315,6 @@
     color: #595959;
     /* Màu icon */
 }
-
-
 
 
 .chat-collapse {

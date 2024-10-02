@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, Input, Upload, Button } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import './postCreate.css';
-import useForm from '../hooks/useForm';
+import useForm from '../../hooks/useForm';
 
 export default function PostCreate(props) {
     const [values, handleChange, handleSubmit, setValues] = useForm(submitPost, { text: '', img: [] });

@@ -13,9 +13,9 @@ function DefaultLayout() {
                 <meta name="description" content="Join Connectify, the next-generation social network designed to bring people closer together." />
             </Helmet>
 
-            <Layout>
+            <Layout style={{ display: 'flex'}}>
                 <HeaderComponent />
-                <Content style={{ padding: '50px' }}>
+                <Content>
                     <Outlet />
                 </Content>
             </Layout>
