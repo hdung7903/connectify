@@ -36,7 +36,7 @@ const ProfilePage = () => {
             <div style={{ position: 'relative', marginBottom: '20px' }}>
 
                 {/* Cover Photo */}
-                <div style={{ height: '280px', backgroundColor: '#d9d9d9', borderRadius: '8px' }}></div>
+                <div style={{ height: '320px', backgroundColor: '#d9d9d9', borderRadius: '8px' }}></div>
 
                 {/* Profile Photo */}
                 <Avatar
