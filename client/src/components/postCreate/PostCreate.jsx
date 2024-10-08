@@ -83,6 +83,7 @@ export default function PostCreate({ onPost }) {
                     onChange={handleImageChange}
                     onRemove={handleRemove}
                     listType="picture"
+                    accept='image/*'
                 >
                     <Button icon={<UploadOutlined />}>Upload Images</Button>
                 </Upload>

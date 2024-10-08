@@ -4,8 +4,6 @@ import { useNavigate } from 'react-router-dom';
 
 const { Text } = Typography;
 
-
-
 const DropdownMenu = ({ username, handleLogout }) => {
 
     const navigate = useNavigate();
