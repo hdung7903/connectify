@@ -19,19 +19,21 @@ export default function Comment(props) {
     }
 
     return (
-        <Row style={{ marginBottom: '16px' }}>
-            <Col span={2}>
-                <AntAvatar 
-                    icon={<UserOutlined />}
-                    src={state.avatar ? `/api/img/${state.avatar}` : null}
-                    size="large" 
-                />
-            </Col>
-            <Col span={22}>
-                <h5>{state.first_name} {state.last_name}</h5>
-                <p>{state.comment}</p>
-                <Reaction onClick={likeComment} liked={state.liked}>{state.likes_num}</Reaction>
-            </Col>
-        </Row>
+        <div>
+            <Row align="middle" style={{ marginBottom: '16px' }}>
+                <Col>
+                    <AntAvatar 
+                        icon={<UserOutlined />} 
+                        src={state.avatar ? `/api/img/${state.avatar}` : null}
+                        size="large" 
+                    />
+                </Col>
+                <Col className="comment" flex="auto" style={{ marginLeft: '8px' }}>
+                    <h5 style={{ margin: 0 }}>{state.first_name} {state.last_name}</h5>
+                    <p style={{ margin: 0 }}>{state.comment}</p>
+                    <Reaction onClick={likeComment} liked={state.liked}>{state.likes_num}</Reaction>
+                </Col>
+            </Row>
+        </div>
     );
 }

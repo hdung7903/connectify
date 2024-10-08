@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Card, Input, Upload, Button, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
+import Avatar from '../avatar/Avatar';
 import './postCreate.css';
 import useForm from '../../hooks/useForm';
 
@@ -36,7 +37,7 @@ export default function PostCreate({ onPost }) {
         const files = fileList.map(file => file.originFileObj);
         handleChange({ name: 'img', value: files });
         setFileList(fileList);
-    };    
+    };
 
     const beforeUpload = (file) => {
         const isImage = file.type.startsWith('image/');
@@ -65,7 +66,13 @@ export default function PostCreate({ onPost }) {
     };
 
     return (
-        <Card className="PostCreate" title="Write a new post">
+        <Card className="PostCreate" title={
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+                <Avatar imgId="https://xsgames.co/randomusers/avatar.php?g=male" />
+                <span style={{ marginLeft: '10px' }}>Write a new post</span>
+            </div>
+        }>
+            <div className="post-split"></div>
             <form onSubmit={handleSubmit}>
                 <Input.TextArea
                     rows={3}
