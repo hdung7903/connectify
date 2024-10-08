@@ -11,8 +11,6 @@ import AuthLayout from '../pages/auth/layout.jsx';
 import UserLayout from '../pages/user/layout.jsx';
 import ChatPage from '../pages/user/chat.jsx';
 import AdminDashboard from '../pages/admin/DashBoard.jsx';
-import AdminUserList from '../pages/admin/ViewListUser.jsx';
-import AdminBanned from '../pages/admin/AccountBaned.jsx';
 import { Route, Routes } from 'react-router-dom';
 import AddFriend from '../pages/user/friend.jsx';
 
