@@ -14,13 +14,20 @@ function LoginPage() {
   const onFinish = (values) => {
     setSpinning(true);
     setTimeout(() => {
-      if (values.username === 'admin' && values.password === '123456') {
+      if (values.username === 'user' && values.password === '123456') {
         message.success('Logged in successfully');
         localStorage.setItem("auth", "true");
         const username = values.username;
         localStorage.setItem("username", username);
         navigate('/home');
-      } else {
+      } else if(values.username === 'admin' && values.password === '123456') {
+        message.success('Logged in successfully');
+        localStorage.setItem("auth", "true");
+        const username = values.username;
+        localStorage.setItem("username", username);
+        navigate('/admin');
+      }
+      else{
         message.error('Invalid username or password');
         setSpinning(false); // Stop spinning if login fails
       }
