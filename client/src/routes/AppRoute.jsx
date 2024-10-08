@@ -1,5 +1,4 @@
 import GuestHomePage from '../pages/(guest)/home.jsx';
-import AdminHomePage from '../pages/admin/home.jsx';
 import UserHomePage from '../pages/user/home.jsx';
 import LoginPage from '../pages/auth/login.jsx';
 import RegisterPage from '../pages/auth/register.jsx';
@@ -11,7 +10,11 @@ import GuestLayout from '../pages/(guest)/layout.jsx';
 import AuthLayout from '../pages/auth/layout.jsx';
 import UserLayout from '../pages/user/layout.jsx';
 import ChatPage from '../pages/user/chat.jsx';
+import AdminDashboard from '../pages/admin/DashBoard.jsx';
+import AdminUserList from '../pages/admin/ViewListUser.jsx';
+import AdminBanned from '../pages/admin/AccountBaned.jsx';
 import { Route, Routes } from 'react-router-dom';
+import AddFriend from '../pages/user/friend.jsx';
 
 function AppRoute() {
     return (
@@ -25,13 +28,14 @@ function AppRoute() {
                 <Route index element={<GuestHomePage />} />
                 <Route path="/home" element={<UserHomePage />} />
                 <Route path="/message" element={<ChatPage />} />
+                <Route path="/suggestions" element={<AddFriend />} />
             </Route>
 
             {/* Admin routes */}
             <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<AdminHomePage />} />
-                {/* Add more admin routes here */}
+                <Route index element={<AdminDashboard />} />
             </Route>
+
             {/* Auth routes */}
             <Route element={<AuthLayout />}>
                 <Route path="/login" element={<LoginPage />} />
