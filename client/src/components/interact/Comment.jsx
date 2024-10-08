@@ -1,7 +1,7 @@
 import React from 'react';
 import { Row, Col, Avatar as AntAvatar } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
-import Like from './Like';
+import Reaction from './Reaction';
 
 export default function Comment(props) {
     const [state, setState] = React.useState({
@@ -30,7 +30,7 @@ export default function Comment(props) {
             <Col span={22}>
                 <h5>{state.first_name} {state.last_name}</h5>
                 <p>{state.comment}</p>
-                <Like onClick={likeComment} liked={state.liked}>{state.likes_num}</Like>
+                <Reaction onClick={likeComment} liked={state.liked}>{state.likes_num}</Reaction>
             </Col>
         </Row>
     );

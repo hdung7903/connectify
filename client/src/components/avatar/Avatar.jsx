@@ -1,16 +1,17 @@
+// Avatar.jsx
 import React from 'react';
-import { Avatar as AntAvatar } from 'antd'; 
+import { Avatar as AntAvatar } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import './avatar.css';
 
-export default function Avatar() {
-    // Always display the anonymous avatar
+export default function Avatar({ imgId }) {
     return (
         <div className="squareAspect">
             <AntAvatar 
-                icon={<UserOutlined />}  // Use Ant Design User icon for anonymous avatar
-                size="large" 
-                className="img avatar" 
+                src={imgId} // Use the provided imgId for the avatar
+                icon={<UserOutlined />} // Fallback icon if imgId is not valid
+                size="large"
+                className="img avatar"
             />
         </div>
     );

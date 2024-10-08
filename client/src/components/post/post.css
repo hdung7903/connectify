@@ -1,0 +1,31 @@
+.post-stats {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+}
+
+.post-stats-left {
+    flex: 1;
+}
+
+.post-stats-right {
+    flex: 1;
+    text-align: right;
+}
+
+.post-actions {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+}
+
+.comment-button {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.post-split {
+    border-top: 1px solid #e0e0e0;
+    width: 100%;
+}
