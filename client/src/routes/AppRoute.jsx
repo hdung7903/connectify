@@ -11,9 +11,10 @@ import AuthLayout from '../pages/auth/layout.jsx';
 import UserLayout from '../pages/user/layout.jsx';
 import ChatPage from '../pages/user/chat.jsx';
 import AdminDashboard from '../pages/admin/DashBoard.jsx';
-import { Route, Routes } from 'react-router-dom';
 import AddFriend from '../pages/user/friend.jsx';
-
+import OwnerProfile from '../pages/user/OwnerProfile.jsx';
+import UserProfile from '../pages/user/UserProfile.jsx';
+import { Route, Routes } from 'react-router-dom';
 function AppRoute() {
     return (
         <Routes>
@@ -27,6 +28,8 @@ function AppRoute() {
                 <Route path="/home" element={<UserHomePage />} />
                 <Route path="/message" element={<ChatPage />} />
                 <Route path="/suggestions" element={<AddFriend />} />
+                <Route path="/profile" element={<OwnerProfile />} />
+                <Route path="/profile/:id" element={<UserProfile />} />
             </Route>
 
             {/* Admin routes */}
