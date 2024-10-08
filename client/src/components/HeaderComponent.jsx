@@ -1,22 +1,24 @@
-import { Layout, Row, Col, Space, Typography, Badge, Popover, List, Avatar as AntAvatar } from 'antd';
-import { useNavigate } from "react-router-dom"
+import { Layout, Row, Col, Space, Typography, Badge, Popover, List, Avatar as AntAvatar, message } from 'antd';
 import MyLogo from './MyLogo.jsx';
 import { useEffect, useState } from 'react';
 import DropdownMenu from './HeaderDropdown.jsx';
 import useLoading from '../hooks/useLoading.jsx';
-const { Header } = Layout;
-const { Title } = Typography;
 import { CommentOutlined, AlertOutlined } from '@ant-design/icons';
 import moment from 'moment';
+import Spinning from './Spinning.jsx';
+
+const { Header } = Layout;
+const { Title } = Typography;
 
 function HeaderComponent() {
     const [auth, setAuth] = useState(localStorage.getItem("auth") === "true");
     const [username, setUsername] = useState(localStorage.getItem("username"));
     const [notifications, setNotifications] = useState([]);
     const [messages, setMessages] = useState([]);
+    const [messagePopoverOpen, setMessagePopoverOpen] = useState(false);
+    const [notificationPopoverOpen, setNotificationPopoverOpen] = useState(false);
 
-    const navigate = useNavigate();
-    const { handleNavigation } = useLoading();
+    const { spinning, handleNavigation } = useLoading();
 
     useEffect(() => {
         const handleStorageChange = () => {
@@ -29,11 +31,14 @@ function HeaderComponent() {
     }, []);
 
     const handleLogout = () => {
-        localStorage.removeItem("auth");
-        localStorage.removeItem("username");
-        setAuth(false);
-        setUsername(null);
-        navigate('/login');
+        handleNavigation('/login', 1000);
+        setTimeout(() => {
+            localStorage.removeItem("auth");
+            localStorage.removeItem("username");
+            message.success('Logged out successfully');
+            setAuth(false);
+            setUsername(null);
+        }, 1000);
     };
 
     useEffect(() => {
@@ -53,7 +58,7 @@ function HeaderComponent() {
             itemLayout="horizontal"
             dataSource={notifications}
             renderItem={item => (
-                <List.Item>
+                <List.Item style={{ cursor: 'pointer' }}>
                     <List.Item.Meta
                         avatar={<AntAvatar src={item.avatar} />}
                         title={
@@ -69,12 +74,17 @@ function HeaderComponent() {
         />
     );
 
+    const handleMessageItemClick = () => {
+        setMessagePopoverOpen(false);
+        handleNavigation('/message', 1000);
+    };
+
     const messageContent = (
         <List
             itemLayout="horizontal"
             dataSource={messages}
             renderItem={item => (
-                <List.Item>
+                <List.Item onClick={handleMessageItemClick} style={{ cursor: 'pointer' }}>
                     <List.Item.Meta
                         avatar={<AntAvatar src={item.avatar} />}
                         title={
@@ -90,66 +100,71 @@ function HeaderComponent() {
         />
     );
 
-    const handleNotificationClick = () => {
-        setNotifications(prevNotifications =>
-            prevNotifications.map(notification => ({ ...notification, read: true }))
-        );
-    };
-    
-    const handleMessageClick = () => {
-        setMessages(prevMessages =>
-            prevMessages.map(message => ({ ...message, read: true }))
-        );
+    const handleNotificationClick = (open) => {
+        if (open) {
+            setNotifications(prevNotifications =>
+                prevNotifications.map(notification => ({ ...notification, read: true }))
+            );
+        }
+        setNotificationPopoverOpen(open);
     };
 
+    const handleMessageClick = (open) => {
+        if (open) {
+            setMessages(prevMessages =>
+                prevMessages.map(message => ({ ...message, read: true }))
+            );
+        }
+        setMessagePopoverOpen(open);
+    };
 
     return (
-        <Header style={{ background: '#4169E1', padding: '0 50px' }}>
-            <Row style={{ width: '100%', height: '100%' }} align="middle" justify="space-between">
-                <Col>
-                    <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => handleNavigation('/home')}>
-                        <MyLogo />
-                        <Title level={3} style={{ color: '#fff', margin: 0, paddingBottom: 25 }}>Connectify</Title>
-                    </div>
-                </Col>
-                <Col>
-                    {auth && username && (
-                        <Col>
-                            <Space size="large" align='center'>
-                                <Popover
-                                    content={notificationContent}
-                                    title="Notifications"
-                                    trigger="click"
-                                    placement="bottomRight"
-                                    style={{ cursor: 'pointer', background: "gray" }}
-                                    onOpenChange={(open) => {
-                                        if (open) handleNotificationClick();
-                                    }}
-                                >
-                                    <Badge count={notifications.filter(n => !n.read).length} overflowCount={99}>
-                                        <AlertOutlined style={{ fontSize: '24px', cursor: 'pointer', color: 'white' }} />
-                                    </Badge>
-                                </Popover>
-                                <Popover
-                                    content={messageContent}
-                                    title="Messages"
-                                    trigger="click"
-                                    placement="bottomRight"
-                                    onOpenChange={(open) => {
-                                        if (open) handleMessageClick();
-                                    }}
-                                >
-                                    <Badge count={messages.filter(m => !m.read).length} overflowCount={99}>
-                                        <CommentOutlined style={{ fontSize: '24px', cursor: 'pointer', color: 'white' }} />
-                                    </Badge>
-                                </Popover>
-                                <DropdownMenu username={username} handleLogout={handleLogout} />
-                            </Space>
-                        </Col>
-                    )}
-                </Col>
-            </Row>
-        </Header>
+        <>
+            <Spinning spinning={spinning} />
+            <Header style={{ background: '#4169E1', padding: '0 50px', position: 'sticky', top: 0, zIndex: 1, height: '64px' }}>
+                <Row style={{ width: '100%', height: '100%' }} align="middle" justify="space-between">
+                    <Col style={{ height: '100%' }}>
+                        <Space align="start " style={{ height: '100%', cursor: 'pointer' }} onClick={() => handleNavigation('/home')}>
+                            <MyLogo style={{ paddingTop: "10px", alignItems: "center", display:"flex" }} />
+                        </Space>
+                    </Col>
+                    <Col style={{ height: '100%' }}>
+                        {auth && username && (
+                            <Col style={{ width: "100%" }}>
+                                <Space size="large" align='start' style={{ height: '100%', display: 'flex', alignItems: 'center' }}>
+                                    <Popover
+                                        content={notificationContent}
+                                        title="Notifications"
+                                        trigger="click"
+                                        placement="bottomRight"
+                                        open={notificationPopoverOpen}
+                                        onOpenChange={handleNotificationClick}
+                                        style={{ cursor: 'pointer', background: "gray" }}
+                                    >
+                                        <Badge count={notifications.filter(n => !n.read).length} overflowCount={99}>
+                                            <AlertOutlined style={{ fontSize: '24px', cursor: 'pointer', color: 'white' }} />
+                                        </Badge>
+                                    </Popover>
+                                    <Popover
+                                        content={messageContent}
+                                        title="Messages"
+                                        trigger="click"
+                                        placement="bottomRight"
+                                        open={messagePopoverOpen}
+                                        onOpenChange={handleMessageClick}
+                                    >
+                                        <Badge count={messages.filter(m => !m.read).length} overflowCount={99}>
+                                            <CommentOutlined style={{ fontSize: '24px', cursor: 'pointer', color: 'white' }} />
+                                        </Badge>
+                                    </Popover>
+                                    <DropdownMenu username={username} handleLogout={handleLogout} />
+                                </Space>
+                            </Col>
+                        )}
+                    </Col>
+                </Row>
+            </Header>
+        </>
     )
 }
 
