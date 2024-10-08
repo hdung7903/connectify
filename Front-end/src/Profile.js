@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { } from 'react-router-dom'
 import { Layout, Avatar, Card, Tabs, Row, Col, Button, Carousel, Divider, List, Typography, Input } from 'antd';
 import { CameraOutlined, VideoCameraOutlined, EnvironmentOutlined, HeartOutlined, InstagramOutlined, UsergroupAddOutlined } from '@ant-design/icons';
-import { LikeOutlined, SmileOutlined, ShopOutlined, MessageOutlined, ShareAltOutlined } from '@ant-design/icons';
+import { LikeOutlined, SmileOutlined, MessageOutlined, ShareAltOutlined } from '@ant-design/icons';
 
 import 'antd'; // Make sure Ant Design styles are loaded
 
