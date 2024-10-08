@@ -1,50 +1,67 @@
 import React, { useState } from 'react';
-import { Card, Input, Upload, Button } from 'antd';
+import { Card, Input, Upload, Button, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import './postCreate.css';
 import useForm from '../hooks/useForm';
 
-export default function PostCreate(props) {
+export default function PostCreate({ onPost }) {
     const [values, handleChange, handleSubmit, setValues] = useForm(submitPost, { text: '', img: [] });
     const [fileList, setFileList] = useState([]);
 
     function submitPost() {
-        console.log(values);
-        let body = JSON.stringify(values);
-        let headers = {
-            'Content-Type': 'application/json'
+        const newPost = {
+            id: Date.now(),
+            userId: 1,
+            text: values.text,
+            images: values.img.map(img => URL.createObjectURL(img)),
+            likes_num: 0,
+            liked: false,
+            comments_num: 0,
+            created_at: new Date().toISOString()
         };
-        if (values.img.length > 0) {
-            body = new FormData();
-            body.append('text', values.text);
-            for (let i = 0; i < values.img.length; i++) {
-                body.append('file' + i, values.img[i]);
-            }
-            headers = {};
+
+        let existingPosts = JSON.parse(localStorage.getItem('posts')) || [];
+        existingPosts.push(newPost);
+        localStorage.setItem('posts', JSON.stringify(existingPosts));
+
+        if (onPost) {
+            onPost(newPost);
         }
 
-        fetch('/api/post', {
-            method: 'POST',
-            body: body,
-            headers: headers,
-        })
-            .then(response => {
-                console.log(response);
-                if (props.onPost) {
-                    props.onPost();
-                }
-                setValues({ text: '', img: [] });
-                setFileList([]);
-            })
-            .catch(err => {
-                console.error(err);
-            });
+        setValues({ text: '', img: [] });
+        setFileList([]);
     }
 
     const handleImageChange = ({ fileList }) => {
-        setFileList(fileList);
         const files = fileList.map(file => file.originFileObj);
-        handleChange({ target: { name: 'img', value: files } });
+        handleChange({ name: 'img', value: files });
+        setFileList(fileList);
+    };    
+
+    const beforeUpload = (file) => {
+        const isImage = file.type.startsWith('image/');
+        if (!isImage) {
+            message.error(`${file.name} is not an image file.`);
+            return Upload.LIST_IGNORE;
+        }
+
+        const newFile = {
+            uid: file.uid,
+            name: file.name,
+            status: 'done',
+            url: URL.createObjectURL(file),
+            originFileObj: file
+        };
+
+        setFileList(prevList => [...prevList, newFile]);
+
+        return false;
+    };
+
+    const handleRemove = (file) => {
+        setFileList(prevList => prevList.filter(item => item.uid !== file.uid));
+        const updatedImages = values.img.filter(img => img !== file.originFileObj);
+        setValues({ ...values, img: updatedImages });
     };
 
     return (
@@ -62,11 +79,9 @@ export default function PostCreate(props) {
                     name="img"
                     multiple
                     fileList={fileList}
-                    beforeUpload={(file) => {
-                        setFileList([...fileList, { uid: file.uid, name: file.name, status: 'done', originFileObj: file }]);
-                        return false;
-                    }}
+                    beforeUpload={beforeUpload}
                     onChange={handleImageChange}
+                    onRemove={handleRemove}
                     listType="picture"
                 >
                     <Button icon={<UploadOutlined />}>Upload Images</Button>
