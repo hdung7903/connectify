@@ -34,6 +34,7 @@ const OwnerProfile = () => {
                             src="https://placehold.co/1100x300"
                             style={{ objectFit: 'cover', height: 300, width: '100%' }}
                             preview={false}
+                            alt="Cover Photo"
                         />
                         <Button
                             style={{ position: 'absolute', bottom: 16, right: 16 }}

@@ -33,7 +33,7 @@ const items = [
     icon: <LaptopOutlined />,
     label: "Posts Management",
     children: [
-      { key: "viewPosts", label: "View list posts" }, // Key for ViewPosts
+      { key: "viewPosts", label: "View list posts" },
       { key: "approvePosts", label: "Pending post" },
     ],
   },
@@ -61,7 +61,7 @@ const items = [
   {
     key: "ReportManagements",
     icon: <GroupOutlined />,
-    label: " ReportManagements",
+    label: "Report Managements",
     children: [{ key: "createGroup", label: "View list reports" }],
   },
 ];

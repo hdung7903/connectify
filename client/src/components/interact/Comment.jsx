@@ -21,7 +21,7 @@ export default function Comment(props) {
     }
 
     return (
-        <div>
+        <div style={{ width: '100%' }}>
             <Row align="middle" style={{ marginBottom: '16px' }}>
                 <Col>
                     <AntAvatar
@@ -31,10 +31,10 @@ export default function Comment(props) {
                     />
                 </Col>
                 <Col flex="auto" style={{ marginLeft: '8px' }}>
-                    <Card style={{ marginBottom: '8px', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)' }}>
+                    <Card style={{ marginBottom: '8px', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', width: '100%' }}>
                         <Card.Meta
                             title={
-                                <Link to={`/profile/1`} className="profile-link" style={{ fontWeight: 'bold', fontSize: '14px' }}>
+                                <Link to={`/profile/1`} className="profile-link" style={{ fontWeight: 'bold', fontSize: '14px', width: '100%' }}>
                                     {`${state.first_name} ${state.last_name}`}
                                 </Link>
                             }
