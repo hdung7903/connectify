@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Divider, Radio, Table } from "antd";
+import { Divider, Radio, Table, Button, message } from "antd";
+
 const columns = [
   {
     title: "Name",
@@ -14,31 +15,46 @@ const columns = [
     title: "Address",
     dataIndex: "address",
   },
+  {
+    title: "Action",
+    dataIndex: "action",
+    render: (_, record) =>
+      record.baned ? (
+        <Button type="primary" onClick={() => handleUnban(record)}>
+          Unban
+        </Button>
+      ) : null,
+  },
 ];
-const data = [
+
+const initialData = [
   {
     key: "1",
     name: "John Brown",
     age: 32,
     address: "New York No. 1 Lake Park",
+    baned: true,
   },
   {
     key: "2",
     name: "Jim Green",
     age: 42,
     address: "London No. 1 Lake Park",
+    baned: false,
   },
   {
     key: "3",
     name: "Joe Black",
     age: 32,
     address: "Sydney No. 1 Lake Park",
+    baned: true,
   },
   {
     key: "4",
     name: "Disabled User",
     age: 99,
     address: "Sydney No. 1 Lake Park",
+    baned: true,
   },
 ];
 
@@ -53,30 +69,35 @@ const rowSelection = {
   },
   getCheckboxProps: (record) => ({
     disabled: record.name === "Disabled User",
-    // Column configuration not to be checked
     name: record.name,
   }),
 };
+
 const AccountBaned = () => {
   const [selectionType, setSelectionType] = useState("checkbox");
+  const [data, setData] = useState(initialData);
+
+  // Handle unban action
+  const handleUnban = (record) => {
+    const updatedData = data.map((item) =>
+      item.key === record.key ? { ...item, baned: false } : item
+    );
+    setData(updatedData);
+    message.success(`${record.name} has been unbanned!`);
+  };
+
+  const banedAccounts = data.filter((account) => account.baned);
 
   return (
     <div>
-      <Radio.Group
-        onChange={(e) => setSelectionType(e.target.value)}
-        value={selectionType}
-      >
-        <Radio value="checkbox">Checkbox</Radio>
-        <Radio value="radio">radio</Radio>
-      </Radio.Group>
-      <Divider />
       <Table
         rowSelection={{
           type: selectionType,
           ...rowSelection,
         }}
         columns={columns}
-        dataSource={data}
+        dataSource={banedAccounts}
+        rowKey="key"
       />
     </div>
   );
