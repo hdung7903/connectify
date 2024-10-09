@@ -59,3 +59,14 @@
     background-color: #f0f0f0;
     color: gray;
 }
+
+.profile-link {
+    text-decoration: none;
+    color: black;
+    transition: text-decoration 0.2s ease;
+}
+
+.profile-link:hover {
+    text-decoration: underline;
+    color: black;
+}
