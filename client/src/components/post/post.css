@@ -6,11 +6,13 @@
 
 .post-stats-left {
     flex: 1;
+    color: gray;
 }
 
 .post-stats-right {
     flex: 1;
     text-align: right;
+    color: gray;
 }
 
 .post-actions {
@@ -28,4 +30,32 @@
 .post-split {
     border-top: 1px solid #e0e0e0;
     width: 100%;
+}
+
+.view-all-comments {
+    color: gray;
+    cursor: pointer;
+    margin: 8px 0;
+}
+
+.postCard .ant-input {
+    color: gray;
+    border: 1px solid gray;
+    background-color: #f0f0f0;
+}
+
+.comment-field {
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    border: 1px solid gray;
+    color: gray;
+    padding: 8px;
+}
+
+.comment {
+    border: 1px solid gray;
+    padding: 8px;
+    margin-bottom: 8px;
+    background-color: #f0f0f0;
+    color: gray;
 }

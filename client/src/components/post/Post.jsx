@@ -1,22 +1,36 @@
-import React from 'react';
-import { Card, Row, Col } from 'antd';
+import React, { useState, useEffect, useRef } from 'react';
+import { Card, Row, Col, Modal, Input, Button } from 'antd';
 import Avatar from '../avatar/Avatar';
 import Reaction from '../interact/Reaction';
 import CommentButton from '../interact/CommentButton';
 import Comments from '../interact/Comments';
 import Slideshow from '../slideshow/Slideshow';
-import { ShareAltOutlined } from '@ant-design/icons';
+import { ShareAltOutlined, SendOutlined } from '@ant-design/icons';
 import './post.css';
+import fakeData from '../feed/fakeData.json';
 
 export default function Post(props) {
-    const { avatar, text, images, likes_num, liked, comments_num, created_at, first_name, last_name } = props;
-    const [state, setState] = React.useState({
+    const { id, avatar, text, images, likes_num, liked, created_at, first_name, last_name } = props;
+
+    const [state, setState] = useState({
         ...props,
         showComments: false,
         commentsLoaded: false,
         comments: [],
-        selectedReaction: null,
+        newComment: '',
+        showModal: false,
     });
+
+    const inputRef = useRef(null);
+
+    useEffect(() => {
+        const postComments = fakeData.comments.filter(comment => comment.postId === id);
+        setState(prevState => ({
+            ...prevState,
+            comments: postComments,
+            commentsLoaded: true
+        }));
+    }, [id]);
 
     function handleReaction(reaction) {
         const { selectedReaction, likes_num } = state;
@@ -41,6 +55,57 @@ export default function Post(props) {
         }
     }
 
+    function toggleComments() {
+        setState(prevState => ({
+            ...prevState,
+            showComments: !prevState.showComments
+        }));
+    }
+
+    function focusCommentInput() {
+        if (inputRef.current) {
+            inputRef.current.focus();
+        }
+    }
+
+    function handleCommentChange(e) {
+        setState({ ...state, newComment: e.target.value });
+    }
+
+    function submitComment() {
+        if (state.newComment.trim()) {
+            const newComment = {
+                id: state.comments.length + 1,
+                postId: id,
+                first_name: 'User',
+                last_name: 'Test',
+                comment: state.newComment,
+                likes_num: 0,
+                avatar: null,
+            };
+
+            setState(prevState => ({
+                ...prevState,
+                comments: [...prevState.comments, newComment],
+                newComment: ''
+            }));
+        }
+    }
+
+    function showAllComments() {
+        setState(prevState => ({
+            ...prevState,
+            showModal: true
+        }));
+    }
+
+    function closeModal() {
+        setState(prevState => ({
+            ...prevState,
+            showModal: false
+        }));
+    }
+
     function parseDateTime(time) {
         const now = Date.now();
         const createdTime = new Date(time).getTime();
@@ -55,28 +120,10 @@ export default function Post(props) {
         return `${Math.floor(diffInSeconds / 29030400)} year${diffInSeconds / 29030400 === 1 ? '' : 's'} ago`;
     }
 
-    function toggleComments() {
-        if (state.commentsLoaded) {
-            setState(prevState => ({
-                ...prevState,
-                showComments: !prevState.showComments
-            }));
-        } else {
-            setTimeout(() => {
-                setState(prevState => ({
-                    ...prevState,
-                    comments: [{ id: 1, text: 'Mock comment 1' }, { id: 2, text: 'Mock comment 2' }],
-                    commentsLoaded: true,
-                    showComments: true
-                }));
-            }, 500);
-        }
-    }
-
     return (
         <Card className="postCard" style={{ marginBottom: '16px' }}>
             <Card.Meta
-                avatar={<Avatar avatar={avatar} />}
+                avatar={<Avatar imgId={avatar || 'https://via.placeholder.com/150'} />}
                 title={`${first_name} ${last_name}`}
                 description={parseDateTime(created_at)}
             />
@@ -90,12 +137,12 @@ export default function Post(props) {
             <div className="post-split"></div>
             <div className="post-stats">
                 <div className="post-stats-left">{state.likes_num} reactions</div>
-                <div className="post-stats-right">{state.comments_num} comments</div>
+                <div className="post-stats-right">{state.comments.length} comments</div>
             </div>
             <div className="post-split"></div>
             <div className="post-actions">
                 <Reaction onReaction={handleReaction} />
-                <span onClick={toggleComments} className="comment-button">
+                <span onClick={focusCommentInput} className="comment-button">
                     <CommentButton>Comment</CommentButton>
                 </span>
                 <span className="share-button">
@@ -103,7 +150,42 @@ export default function Post(props) {
                     Share
                 </span>
             </div>
-            {state.showComments && <Comments comments={state.comments} />}
+            <div className="post-split"></div>
+            <div>
+                {state.comments.length > 2 && (
+                    <div className="view-all-comments" onClick={showAllComments}>
+                        View all comments
+                    </div>
+                )}
+                {state.comments.length > 0 ? (
+                    <Comments comments={state.comments.slice(0, 2)} />
+                ) : null}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+                <Avatar imgId={avatar} />
+                <Input
+                    ref={inputRef}
+                    value={state.newComment}
+                    onChange={handleCommentChange}
+                    placeholder="Write a comment..."
+                    style={{ marginTop: '8px', marginLeft: '8px', backgroundColor: '#f0f0f0' }}
+                    suffix={
+                        <Button
+                            type="primary"
+                            icon={<SendOutlined />}
+                            onClick={submitComment}
+                        />
+                    }
+                />
+            </div>
+            <Modal
+                title="All Comments"
+                open={state.showModal}
+                onCancel={closeModal}
+                footer={null}
+            >
+                <Comments comments={state.comments} />
+            </Modal>
         </Card>
     );
 }

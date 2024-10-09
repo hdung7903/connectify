@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import Post from '../post/Post';
 import fakeData from './fakeData.json';
 
-export default function Feed({ newPost }) {
+    export default function Feed({ newPost }) {
     const [posts, setPosts] = useState(fakeData.posts);
 
     useEffect(() => {
         if (newPost) {
-            setPosts(prevPosts => [newPost, ...prevPosts]);  // Ensure correct updating
+            setPosts(prevPosts => [newPost, ...prevPosts]);
         }
     }, [newPost]);
 
@@ -27,9 +27,9 @@ export default function Feed({ newPost }) {
                         comments_num={post.comments_num}
                         created_at={post.created_at}
                         images={post.images}
-                        avatar={user?.avatar}
-                        first_name={user?.first_name}
-                        last_name={user?.last_name}
+                        avatar={user ? user.avatar : null}
+                        first_name={user ? user.first_name : 'Unknown'}
+                        last_name={user ? user.last_name : 'User'}
                     />
                 );
             })}

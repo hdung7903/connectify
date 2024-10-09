@@ -1,3 +1,8 @@
 .postComposer .card-header {
     font-weight: 700;
 }
+
+.post-split {
+    border-top: 1px solid #e0e0e0;
+    width: 100%;
+}
