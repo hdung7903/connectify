@@ -14,7 +14,6 @@ function DefaultLayout() {
             </Helmet>
 
             <Layout style={{ display: 'flex'}}>
-                <HeaderComponent />
                 <Content>
                     <Outlet />
                 </Content>
