@@ -8,6 +8,7 @@ import Slideshow from '../slideshow/Slideshow';
 import { ShareAltOutlined, SendOutlined } from '@ant-design/icons';
 import './post.css';
 import fakeData from '../feed/fakeData.json';
+import { Link } from 'react-router-dom';
 
 export default function Post(props) {
     const { id, avatar, text, images, likes_num, liked, created_at, first_name, last_name } = props;
@@ -123,18 +124,19 @@ export default function Post(props) {
     return (
         <Card className="postCard" style={{ marginBottom: '16px' }}>
             <Card.Meta
-                avatar={<Avatar imgId={avatar || 'https://via.placeholder.com/150'} />}
-                title={`${first_name} ${last_name}`}
-                description={parseDateTime(created_at)}
+                avatar={<Avatar imgId={avatar || 'https://placeholder.co/40x40'} />}
+                title={
+                    <Link to={`/profile/1`} className="profile-link">
+                        {`${first_name} ${last_name}`}
+                    </Link>
+                }
             />
-            <div className="post-split"></div>
             <Row>
                 <Col span={24}>
                     <p>{state.text}</p>
                     {Array.isArray(state.images) && <Slideshow images={state.images} />}
                 </Col>
             </Row>
-            <div className="post-split"></div>
             <div className="post-stats">
                 <div className="post-stats-left">{state.likes_num} reactions</div>
                 <div className="post-stats-right">{state.comments.length} comments</div>
