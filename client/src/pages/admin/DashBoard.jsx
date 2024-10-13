@@ -4,13 +4,17 @@ import {
   UserOutlined,
   CommentOutlined,
   GroupOutlined,
-  CrownOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
 import { Breadcrumb, Layout, Menu, theme, Dropdown, Space } from "antd";
 import ViewListUser from "./ViewListUser";
 import AccountBaned from "./AccountBaned";
+import ViewPosts from "./ViewPosts"; // Import ViewPosts
 import { RxAvatar } from "react-icons/rx";
+import PendingPost from "./PendingPost";
+import ViewPages from "./ViewPages";
+import PendingPages from "./PendingPages";
+import Baned from "./Baned";
 
 const { Header, Content, Sider } = Layout;
 
@@ -30,7 +34,6 @@ const items = [
     label: "Posts Management",
     children: [
       { key: "viewPosts", label: "View list posts" },
-      { key: "deletePosts", label: "Post has been deleted" },
       { key: "approvePosts", label: "Pending post" },
     ],
   },
@@ -58,7 +61,7 @@ const items = [
   {
     key: "ReportManagements",
     icon: <GroupOutlined />,
-    label: " ReportManagements",
+    label: "Report Managements",
     children: [{ key: "createGroup", label: "View list reports" }],
   },
 ];
@@ -89,6 +92,21 @@ const App = () => {
     } else if (key === "editUser") {
       setContent(<AccountBaned />);
       setContent2("account baned list");
+    } else if (key === "viewPosts") {
+      setContent(<ViewPosts />); // Chuyển sang ViewPosts
+      setContent2("view posts");
+    } else if (key === "approvePosts") {
+      setContent(<PendingPost />);
+      setContent2("pending post");
+    } else if (key === "manageGroupMembers") {
+      setContent(<ViewPages />);
+      setContent2("View pages");
+    } else if (key === "createGroup") {
+      setContent(<PendingPages />);
+      setContent2("Pending page");
+    } else if (key === "approveGroupContent") {
+      setContent(<Baned />);
+      setContent2("Baned pages");
     }
   };
 
@@ -160,7 +178,7 @@ const App = () => {
               boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
             }}
           >
-            {content} {/* Hiển thị nội dung dựa trên lựa chọn menu */}
+            {content}
           </Content>
         </Layout>
       </Layout>

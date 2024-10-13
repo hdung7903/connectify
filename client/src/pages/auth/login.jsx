@@ -29,7 +29,7 @@ function LoginPage() {
       }
       else{
         message.error('Invalid username or password');
-        setSpinning(false); // Stop spinning if login fails
+        setSpinning(false);
       }
     }, 1000);
   };

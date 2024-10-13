@@ -3,11 +3,14 @@ import MyLogo from './MyLogo.jsx';
 import { useEffect, useState } from 'react';
 import DropdownMenu from './HeaderDropdown.jsx';
 import useLoading from '../hooks/useLoading.jsx';
-const { Header } = Layout;
-const { Title } = Typography;
 import { CommentOutlined, AlertOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import Spinning from './Spinning.jsx';
+
+
+const { Header } = Layout;
+const { Title } = Typography;
+
 
 function HeaderComponent() {
     const [auth, setAuth] = useState(localStorage.getItem("auth") === "true");

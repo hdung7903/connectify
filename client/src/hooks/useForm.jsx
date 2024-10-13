@@ -1,43 +1,36 @@
-import { useState } from 'react'
+import { useState } from 'react';
 
-/**
- * React hook for form value handling
- * @param submitFunction Callback that get's called onSubmit
- */
 export default function useForm(submitFunction, initial) {
-    const [values, setValues] = useState((initial ? initial : {}));
+    const [values, setValues] = useState(initial || {});
 
     /**
      * Handle change in input element
-     * @param e Event
+     * @param e Event or custom object
      */
     const handleChange = (e) => {
-        e.persist();
-        const name = e.target.name;
-        let value;
-        if (e.target.type === 'checkbox') {
-            value = e.target.checked;
-        } else if (e.target.type === 'file') {
-            value = e.target.files;
+        let name, value;
+
+        if (e.target) {
+            name = e.target.name;
+            if (e.target.type === 'checkbox') {
+                value = e.target.checked;
+            } else if (e.target.type === 'file') {
+                value = e.target.files;
+            } else {
+                value = e.target.value;
+            }
         } else {
-            value = e.target.value;
+            name = e.name;
+            value = e.value;
         }
-        setValues( values => ({ ...values, [name]: value}));
-    }
-    
-    /**
-     * Handle submit, runs the supplied callback function
-     * @param e Event
-     */
+
+        setValues(prevValues => ({ ...prevValues, [name]: value }));
+    };
+
     const handleSubmit = (e) => {
         if (e) e.preventDefault();
         submitFunction();
-    }
+    };
 
-    return [
-        values,
-        handleChange,
-        handleSubmit,
-        setValues
-    ]
+    return [values, handleChange, handleSubmit, setValues];
 }
