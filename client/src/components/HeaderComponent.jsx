@@ -7,10 +7,8 @@ import { CommentOutlined, AlertOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import Spinning from './Spinning.jsx';
 
-
 const { Header } = Layout;
 const { Title } = Typography;
-
 
 function HeaderComponent() {
     const [auth, setAuth] = useState(localStorage.getItem("auth") === "true");
@@ -127,7 +125,7 @@ function HeaderComponent() {
                 <Row style={{ width: '100%', height: '100%' }} align="middle" justify="space-between">
                     <Col style={{ height: '100%' }}>
                         <Space align="start " style={{ height: '100%', cursor: 'pointer' }} onClick={() => handleNavigation('/home')}>
-                            <MyLogo style={{ paddingTop: "10px", alignItems: "center", display:"flex" }} />
+                            <MyLogo style={{ paddingTop: "10px", alignItems: "center", display: "flex" }} />
                         </Space>
                     </Col>
                     <Col style={{ height: '100%' }}>
@@ -170,4 +168,4 @@ function HeaderComponent() {
     )
 }
 
-export default HeaderComponent
+export default HeaderComponent;
