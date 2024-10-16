@@ -3,6 +3,10 @@ const morgan = require('morgan');
 const cors = require('cors');
 const createError = require('http-errors');
 const connectDB = require('./config/database');
+const path = require('path');
+require('dotenv').config();
+
+const PORT=process.env.PORT || 9999
 
 const app = express();
 
@@ -10,6 +14,8 @@ app.use(morgan('dev'));
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
 connectDB();
 
@@ -26,6 +32,6 @@ app.use(async (err, req, res, next) => {
     res.send({ message: { status: err.status, message: err.message } });
 });
 
-app.listen(9999, () => {
-    console.log('Server started on port 9999');
+app.listen(PORT, () => {
+    console.log(`Server started on port ${PORT}`);
 })
