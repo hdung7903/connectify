@@ -1,3 +1,6 @@
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
+
 const chatSchema = new Schema({
     type: { type: String, enum: ['personal', 'group'], required: true },
     participants: [{
@@ -17,4 +20,6 @@ const chatSchema = new Schema({
     updatedAt: { type: Date, default: Date.now }
 }, { timestamps: true });
 
-module.exports = mongoose.model('Chat', chatSchema);
+const Chat = mongoose.model('Chat', chatSchema);
+
+module.exports = Chat

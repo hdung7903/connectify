@@ -1,24 +1,30 @@
 import { Input, Button, Card, Form, message, Typography, Space } from 'antd';
 import { MailOutlined } from '@ant-design/icons';
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import MyLogo from '../../components/MyLogo';
 import { useState } from 'react';
 import Spinning from '../../components/Spinning';
+import axios from 'axios';
+
 const { Title, Text } = Typography;
 
 function ForgotPasswordPage() {
-
-    const navigate = useNavigate();
     const [spinning, setSpinning] = useState(false);
 
-    const onFinish = (values) => {
+    const onFinish = async (values) => {
         setSpinning(true);
-        console.log('Success:', values);
-        message.success('Password reset link sent to your email!');
-        setTimeout(() => {
-            navigate('/login');
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/forgot-password`, values);
+            if (response.status === 200) {
+                message.success('Password reset link sent to your email!');
+            } else {
+                message.error(`Error: ${response.data.message}`);
+            }
+        } catch (error) {
+            message.error(`Error: ${error.response?.data?.message || 'Unexpected error occurred.'}`);
+        } finally {
             setSpinning(false);
-        }, 1000);
+        }
     };
 
     const onFinishFailed = (errorInfo) => {

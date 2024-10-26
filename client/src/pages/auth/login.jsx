@@ -4,35 +4,34 @@ import { Link, useNavigate } from "react-router-dom";
 import MyLogo from '../../components/MyLogo';
 import { useState } from 'react';
 import Spinning from '../../components/Spinning';
+import { useAuth } from '../../contexts/AuthContext';
 
 const { Title, Text } = Typography;
 
 function LoginPage() {
   const navigate = useNavigate();
   const [spinning, setSpinning] = useState(false);
+  const { loginContext } = useAuth(); ;
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     setSpinning(true);
-    setTimeout(() => {
-      if (values.username === 'user' && values.password === '123456') {
-        message.success('Logged in successfully');
-        localStorage.setItem("auth", "true");
-        const username = values.username;
-        localStorage.setItem("username", username);
-        navigate('/home');
-      } else if(values.username === 'admin' && values.password === '123456') {
-        message.success('Logged in successfully');
-        localStorage.setItem("auth", "true");
-        const username = values.username;
-        localStorage.setItem("username", username);
-        navigate('/admin');
+    try {
+      const result = await loginContext(values);
+      if (result.success) {
+        message.success("Login successful. Welcome back!");
+        setTimeout(() => {
+          navigate('/home', { replace: true });
+        }, 100);
+      } else {
+        message.error(`Login failed! ${result.message}`);
       }
-      else{
-        message.error('Invalid username or password');
-        setSpinning(false);
-      }
-    }, 1000);
+    } catch (error) {
+      message.error(`Login failed! ${error.message}`);
+    } finally {
+      setSpinning(false);
+    }
   };
+
 
   const onFinishFailed = () => {
     message.error('Please complete the form!');

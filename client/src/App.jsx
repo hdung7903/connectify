@@ -1,7 +1,14 @@
 import { Outlet } from 'react-router-dom'
 import { Helmet, HelmetProvider } from 'react-helmet-async'
+import Spinning from './components/Spinning';
+import { useAuth } from './contexts/AuthContext';
 
 function App() {
+  const { loading } = useAuth();
+  
+  if (loading) {
+    return <Spinning spinning={true} />;
+  }
   return (
     <HelmetProvider>
       <Helmet>
