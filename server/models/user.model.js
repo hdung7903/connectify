@@ -6,6 +6,7 @@ const userSchema = new Schema({
     email: { type: String, required: true, unique: true },
     passwordHash: { type: String, required: true },
     gender: { type: String, enum: ["male", "female", "other"], required: true },
+    verifiedCode: { type: String },
     dob: { type: Date },
     avatarUrl: { type: String },
     bio: { type: String },
@@ -23,13 +24,14 @@ const userSchema = new Schema({
     role: { type: String, enum: ["user", "admin"], default: "user" },
     isDeleted: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },
-    status: { type: String, enum: ["online", "offline", "away", "busy"], default: "offline" },
     createdAt: { type: Date, default: Date.now },
     accountVerification: {
         isVerified: { type: Boolean, default: false },
         verificationCode: { type: String },
-        verifiedAt: { type: Date }
+        verifiedAt: { type: Date },
     },
 }, { timestamps: true });
 
-module.exports = mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema);
+
+module.exports = User

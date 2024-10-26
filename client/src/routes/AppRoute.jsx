@@ -15,6 +15,8 @@ import AddFriend from '../pages/user/friend.jsx';
 import OwnerProfile from '../pages/user/OwnerProfile.jsx';
 import UserProfile from '../pages/user/UserProfile.jsx';
 import { Route, Routes } from 'react-router-dom';
+import VerifyAccount from '../pages/auth/verify-account.jsx';
+import ProtectedRoute from './ProtectedRoute.jsx';
 function AppRoute() {
     return (
         <Routes>
@@ -23,7 +25,19 @@ function AppRoute() {
                 <Route index element={<GuestHomePage />} />
             </Route>
 
-            <Route element={<UserLayout />}>
+            <Route element={<AuthLayout />}>
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="/reset-password/:token/:email" element={<ResetPasswordPage />} />
+                <Route path="/verify/:token/:email" element={<VerifyAccount />} />
+            </Route>
+
+            <Route element={
+                <ProtectedRoute>
+                    <UserLayout />
+                </ProtectedRoute>
+            }>
                 <Route index element={<GuestHomePage />} />
                 <Route path="/home" element={<UserHomePage />} />
                 <Route path="/message" element={<ChatPage />} />
@@ -33,17 +47,16 @@ function AppRoute() {
             </Route>
 
             {/* Admin routes */}
-            <Route path="/admin" element={<AdminLayout />}>
+            <Route path="/admin" element={
+                <ProtectedRoute>
+                    <AdminLayout />
+                </ProtectedRoute>
+            }>
                 <Route index element={<AdminDashboard />} />
             </Route>
 
             {/* Auth routes */}
-            <Route element={<AuthLayout />}>
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
-                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                <Route path="/reset-password/:id" element={<ResetPasswordPage />} />
-            </Route>
+           
             {/* Not Found route */}
             <Route path="*" element={<NotFoundPage />} />
         </Routes>

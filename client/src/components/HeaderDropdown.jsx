@@ -6,7 +6,7 @@ import Spinning from './Spinning';
 
 const { Text } = Typography;
 
-const DropdownMenu = ({ username, handleLogout }) => {
+const DropdownMenu = ({ username, avatar, handleLogout }) => {
 
     const { spinning, handleNavigation } = useLoading();
 
@@ -20,7 +20,7 @@ const DropdownMenu = ({ username, handleLogout }) => {
                     <Text type="secondary" style={{ fontSize: '12px' }}>View Profile</Text>
                 </div>
             ),
-            icon: <Avatar size={32} src="https://xsgames.co/randomusers/avatar.php?g=male" />,
+            icon: <Avatar size={32} src={avatar ?? "https://xsgames.co/randomusers/avatar.php?g=male"} />,
         },
         {
             type: 'divider',
@@ -47,7 +47,7 @@ const DropdownMenu = ({ username, handleLogout }) => {
                 <Space align='start' style={{ color: '#fff', cursor: 'pointer', alignItems: 'start', paddingBottom: '28px' }}>
                     <Avatar
                         size={40}
-                        src="https://xsgames.co/randomusers/avatar.php?g=male"
+                        src={avatar ?? "https://xsgames.co/randomusers/avatar.php?g=male"}
                         style={{ alignItems: 'start' }}
                     />
                 </Space>

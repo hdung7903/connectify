@@ -1,24 +1,31 @@
-import { Input, Button, Card, Form, Checkbox, message, Typography, Space } from 'antd';
+import { Input, Button, Card, Form, Checkbox, message, Typography, Space, Select, DatePicker } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from "react-router-dom";
 import MyLogo from '../../components/MyLogo';
 import Spinning from '../../components/Spinning';
 import { useState } from 'react';
+import { registerService } from '../../services/auth.service';
 
 const { Title, Text } = Typography;
+const { Option } = Select;
 
 function RegisterPage() {
     const [spinning, setSpinning] = useState(false);
     const navigate = useNavigate();
-    const onFinish = (values) => {
+
+    const onFinish = async (values) => {
         setSpinning(true);
-        console.log('Success:', values);
-        message.success('Registration successful!');
-        setTimeout(() => {
-            setSpinning(false);
+        const { success, message: resultMessage } = await registerService(values);
+        setSpinning(false);
+
+        if (success) {
+            message.success(resultMessage);
             navigate('/login');
-        }, 1000);
+        } else {
+            message.error(resultMessage);
+        }
     };
+
 
     const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
@@ -97,6 +104,24 @@ function RegisterPage() {
                             ]}
                         >
                             <Input.Password prefix={<LockOutlined />} placeholder="Confirm Password" />
+                        </Form.Item>
+
+                        <Form.Item
+                            name="gender"
+                            rules={[{ required: true, message: 'Please select your gender!' }]}
+                        >
+                            <Select placeholder="Select your gender">
+                                <Option value="male">Male</Option>
+                                <Option value="female">Female</Option>
+                                <Option value="other">Other</Option>
+                            </Select>
+                        </Form.Item>
+
+                        <Form.Item
+                            name="dob"
+                            rules={[{ required: true, message: 'Please input your date of birth!' }]}
+                        >
+                            <DatePicker style={{ width: '100%' }} placeholder="Date of Birth" />
                         </Form.Item>
 
                         <Form.Item
