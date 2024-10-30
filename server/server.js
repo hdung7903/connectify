@@ -8,6 +8,7 @@ const connectDB = require('./config/database');
 const path = require('path');
 const authRouter = require('./routes/auth.route');
 const cookieParser = require('cookie-parser');
+const postRouter = require('./routes/post.route');
 require('dotenv').config();
 
 const PORT = process.env.PORT || 9999
@@ -51,6 +52,7 @@ app.get('/', (req, res) => {
  */
 app.use("/auth", authRouter);
 
+app.use('/posts', postRouter);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
