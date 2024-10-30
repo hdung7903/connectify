@@ -135,19 +135,15 @@ export const resendForgotPasswordService = async (email) => {
 
 export const refreshTokenService = async () => {
     try {
-        const response = await api.post('/auth/refresh-token', { refreshToken: localStorage.getItem('refresh_token') });
+        const response = await api.post('/auth/refresh');
         if (response.status === 200) {
             return response.data;
-        } else {
-            return { success: false, message: response.data.message || "Failed to refresh token" };
         }
+        throw new Error(response.data.message || "Failed to refresh token");
     } catch (error) {
-        return {
-            success: false,
-            message: error.response?.data?.message || "Refresh token failed due to a network error",
-        };
+        throw new Error(error.response?.data?.message || "Refresh token failed");
     }
-}
+};
 
 export const meService = async () => {
     try {

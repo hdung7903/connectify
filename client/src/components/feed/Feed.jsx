@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Post from '../post/Post';
 import fakeData from './fakeData.json';
 
-    export default function Feed({ newPost }) {
+export default function Feed({ newPost }) {
     const [posts, setPosts] = useState(fakeData.posts);
 
     useEffect(() => {

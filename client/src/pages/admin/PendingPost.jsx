@@ -31,7 +31,7 @@ const posts = [
     author: "Michael Brown",
     date: "2023-10-09",
     avatar: "https://via.placeholder.com/150",
-    status: "approved", // Không hiện trong danh sách vì status là approved
+    status: "approved",
   },
 ];
 

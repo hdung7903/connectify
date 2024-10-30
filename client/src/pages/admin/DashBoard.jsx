@@ -9,7 +9,7 @@ import {
 import { Breadcrumb, Layout, Menu, theme, Dropdown, Space } from "antd";
 import ViewListUser from "./ViewListUser";
 import AccountBaned from "./AccountBaned";
-import ViewPosts from "./ViewPosts"; // Import ViewPosts
+import ViewPosts from "./ViewPosts";
 import { RxAvatar } from "react-icons/rx";
 import PendingPost from "./PendingPost";
 import ViewPages from "./ViewPages";

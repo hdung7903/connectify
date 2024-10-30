@@ -81,6 +81,7 @@ export default function PostCreate({ onPost }) {
                     onChange={handleChange}
                     value={values.text}
                     className="PostCreate-input-text"
+                    aria-label="Post content"
                 />
                 <Upload
                     name="img"

@@ -11,7 +11,7 @@ const cookieParser = require('cookie-parser');
 require('dotenv').config();
 
 const PORT = process.env.PORT || 9999
-const whitelist = process.env.FRONTEND_URL.split(',').map(url => url.trim());
+const whitelist = [`${process.env.FRONTEND_URL}`,`${process.env.BACKEND_URL}`, undefined];
 const app = express();
 
 app.use(morgan('dev'));
@@ -43,7 +43,15 @@ app.get('/', (req, res) => {
     res.send('Hello World');
 });
 
+/**
+ * @swagger
+ * tags:
+ *   name: Authentication
+ *   description: API Routes for authentication
+ */
 app.use("/auth", authRouter);
+
+
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Card, Row, Col, Modal, Input, Button } from 'antd';
+import { Card, Row, Col, Modal, Input, Button, Typography } from 'antd';
 import Avatar from '../avatar/Avatar';
 import Reaction from '../interact/Reaction';
 import CommentButton from '../interact/CommentButton';
@@ -9,6 +9,8 @@ import { ShareAltOutlined, SendOutlined } from '@ant-design/icons';
 import './post.css';
 import fakeData from '../feed/fakeData.json';
 import { Link } from 'react-router-dom';
+
+const { Text,Paragraph } = Typography;
 
 export default function Post(props) {
     const { id, avatar, text, images, likes_num, liked, created_at, first_name, last_name } = props;
@@ -21,6 +23,10 @@ export default function Post(props) {
         newComment: '',
         showModal: false,
     });
+
+    const [expanded, setExpanded] = useState(false);
+
+    const toggle = () => setExpandable(p => !p);
 
     const inputRef = useRef(null);
 
@@ -133,7 +139,18 @@ export default function Post(props) {
             />
             <Row>
                 <Col span={24}>
-                    <p>{state.text}</p>
+                    <Paragraph ellipsis={{ rows: expanded===true && 2, expandable: false }}>
+                        {state.text}
+                    </Paragraph>
+                    {state.text.length > 100 && (
+                        <Text
+                            type="secondary"
+                            style={{ cursor: 'pointer', color: '#1890ff' }}
+                            onClick={() => setExpanded(!expanded)}
+                        >
+                            {expanded ? 'Show less' : 'Show more'}
+                        </Text>
+                    )}
                     {Array.isArray(state.images) && <Slideshow images={state.images} />}
                 </Col>
             </Row>

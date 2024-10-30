@@ -4,13 +4,13 @@ import { useAuth } from '../contexts/AuthContext';
 import Spinning from '../components/Spinning';
 
 function ProtectedRoute({ children }) {
-    const { authState, loading } = useAuth();
+    const { isAuthenticated, loading } = useAuth();
 
     if (loading) {
         return <Spinning spinning={true} />;
     }
 
-    if (!authState.isAuthenticated||!authState.accessToken||authState.isAuthenticated===false) {
+    if (!isAuthenticated) {
         return <Navigate to="/login"  replace />;
     }
 

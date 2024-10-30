@@ -1,6 +1,62 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       properties:
+ *         username:
+ *           type: string
+ *           description: Unique username of the user
+ *         email:
+ *           type: string
+ *           description: User's email address
+ *         passwordHash:
+ *           type: string
+ *           description: Hashed password for the user
+ *         gender:
+ *           type: string
+ *           enum: ["male", "female", "other"]
+ *           description: User's gender
+ *         verifiedCode:
+ *           type: string
+ *           description: Verification code for account
+ *         dob:
+ *           type: string
+ *           format: date
+ *           description: Date of birth of the user
+ *         avatarUrl:
+ *           type: string
+ *           description: URL of the user's avatar image
+ *         bio:
+ *           type: string
+ *           description: Short bio of the user
+ *         location:
+ *           type: object
+ *           properties:
+ *             city:
+ *               type: string
+ *             country:
+ *               type: string
+ *             lat:
+ *               type: number
+ *             long:
+ *               type: number
+ *           description: Location details of the user
+ *         friends:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: List of user IDs representing friends
+ *       required:
+ *         - username
+ *         - email
+ *         - passwordHash
+ */
+
 const userSchema = new Schema({
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
@@ -9,6 +65,7 @@ const userSchema = new Schema({
     verifiedCode: { type: String },
     dob: { type: Date },
     avatarUrl: { type: String },
+    coverAvaUrl: { type: String },
     bio: { type: String },
     location: {
         city: String,

@@ -13,7 +13,7 @@ const { Header } = Layout;
 const { Title } = Typography;
 
 function HeaderComponent() {
-    const { authState, logout } = useAuth();
+    const { isAuthenticated, user, accessToken, logout } = useAuth();
     const [userProfile, setUserProfile] = useState({
         username: null,
         avatar: null
@@ -26,11 +26,11 @@ function HeaderComponent() {
 
     useEffect(() => {
         const fetchUserProfile = async () => {
-            if (authState.isAuthenticated && authState.accessToken) {
+            if (isAuthenticated && accessToken) {
                 try {
                     const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/auth/me`, {
                         headers: {
-                            'Authorization': `Bearer ${authState.accessToken}`
+                            'Authorization': `Bearer ${accessToken}`
                         }
                     });
                     setUserProfile({
@@ -47,7 +47,7 @@ function HeaderComponent() {
         };
 
         fetchUserProfile();
-    }, [authState.isAuthenticated, authState.accessToken]);
+    }, [isAuthenticated, accessToken]);
 
 
     const handleLogout = async () => {
@@ -66,6 +66,7 @@ function HeaderComponent() {
             message.error('Failed to logout');
         }
     };
+
     useEffect(() => {
         // Simulate fetching notifications and messages from an API
         setNotifications([
@@ -154,7 +155,7 @@ function HeaderComponent() {
                         </Space>
                     </Col>
                     <Col style={{ height: '100%' }}>
-                        {authState.isAuthenticated && userProfile.username && (
+                        {isAuthenticated && (
                             <Col style={{ width: "100%" }}>
                                 <Space size="large" align='start' style={{ height: '100%', display: 'flex', alignItems: 'center' }}>
                                     <Popover

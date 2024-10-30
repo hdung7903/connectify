@@ -78,44 +78,36 @@ const login = async (req, res, next) => {
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             secure: true,
-            sameSite: 'strict', 
-            maxAge: 7 * 24 * 60 * 60 * 1000 
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000
         });
 
-        res.status(200).json({ accessToken });
+        return res.status(200).json({ accessToken });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: err.message });
     }
 };
 
 const refreshToken = async (req, res, next) => {
-    const { refreshToken } = req.body;
+    if (req.cookies?.refreshToken) {
 
-    if (!refreshToken) {
-        return res.status(401).json({ message: 'Refresh token required' });
-    }
+        // Destructuring refreshToken from cookie
+        const refreshToken = req.cookies.refreshToken;
 
-    try {
-        const decoded = await verifyRefreshToken(refreshToken);
-
-        const user = await User.findById(decoded.userId);
-
-        if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-        }
-
-        const accessToken = generateAccessToken(user);
-        const newRefreshToken = await generateRefreshToken(user);
-
-        // Revoke the old refresh token
-        await revokeRefreshToken(refreshToken);
-
-        res.json({
-            accessToken,
-            refreshToken: newRefreshToken
-          });
-    } catch (err) {
-        res.status(403).json({ message: err.message });
+        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET,
+            (err, decoded) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(406).json({ message: 'Unauthorized' });
+                }
+                else {
+                    // Correct token we send a new access token
+                    const accessToken = generateAccessToken(decoded);
+                    return res.json({ accessToken });
+                }
+            })
+    } else {
+        return res.status(406).json({ message: 'Unauthorized' });
     }
 }
 
@@ -363,9 +355,9 @@ const getMe = async (req, res) => {
 
     } catch (error) {
         console.error('getMe error:', error);
-        res.status(500).json({ 
+        res.status(500).json({
             message: 'Error fetching user data',
-            error: error.message 
+            error: error.message
         });
     }
 };

@@ -1,4 +1,3 @@
-import HeaderComponent from '../../components/HeaderComponent';
 import { Layout } from 'antd';
 import { Outlet } from 'react-router-dom';
 import { Helmet } from "react-helmet-async";
