@@ -1,29 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { Tooltip } from "antd";
+import { Picker } from "emoji-mart";
 import {
     LikeOutlined,
-    LikeFilled,
     HeartOutlined,
-    HeartFilled,
     SmileOutlined,
-    SmileFilled,
     MehOutlined,
-    MehFilled,
     FrownOutlined,
-    FrownFilled
 } from '@ant-design/icons';
-import { Tooltip } from 'antd';
 
 const reactions = [
-    { type: 'like', icon: LikeOutlined, filledIcon: LikeFilled },
-    { type: 'love', icon: HeartOutlined, filledIcon: HeartFilled },
-    { type: 'haha', icon: SmileOutlined, filledIcon: SmileFilled },
-    { type: 'wow', icon: MehOutlined, filledIcon: MehFilled },
-    { type: 'sad', icon: FrownOutlined, filledIcon: FrownFilled },
+    { type: "like", emoji: "👍", icon: <LikeOutlined /> },
+    { type: "love", emoji: "❤️", icon: <HeartOutlined /> },
+    { type: "haha", emoji: "😄", icon: <SmileOutlined /> },
+    { type: "wow", emoji: "😲", icon: <MehOutlined /> },
+    { type: "sad", emoji: "😢", icon: <FrownOutlined /> },
 ];
 
 export default function Reaction({ onReaction }) {
     const [selectedReaction, setSelectedReaction] = useState(null);
     const [visible, setVisible] = useState(false);
+    const [showPicker, setShowPicker] = useState(false);
 
     const handleMouseEnter = () => {
         setVisible(true);
@@ -31,6 +28,7 @@ export default function Reaction({ onReaction }) {
 
     const handleMouseLeave = () => {
         setVisible(false);
+        setShowPicker(false);
     };
 
     const handleReactionClick = (type) => {
@@ -45,30 +43,51 @@ export default function Reaction({ onReaction }) {
         }
     };
 
+    const handleEmojiSelect = (emoji) => {
+        setSelectedReaction(emoji.id);
+        if (onReaction) {
+            onReaction(emoji.id);
+        }
+        setShowPicker(false);
+    };
+
     return (
-        <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} style={{ cursor: 'pointer' }}>
+        <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} style={{ cursor: "pointer" }}>
             {visible ? (
-                <div style={{ display: 'flex', gap: '5px' }}>
-                    {reactions.map(({ type, icon: Icon, filledIcon: FilledIcon }) => (
+                <div style={{ display: "flex", gap: "5px" }}>
+                    {reactions.map(({ type, emoji, icon }) => (
                         <Tooltip title={type.charAt(0).toUpperCase() + type.slice(1)} key={type}>
                             <span
                                 onClick={() => handleReactionClick(type)}
-                                style={{ cursor: 'pointer', color: selectedReaction === type ? '#1890ff' : 'inherit', display: 'flex', alignItems: 'center' }}
+                                style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
                             >
-                                {selectedReaction === type ? <FilledIcon style={{ color: '#1890ff' }} /> : <Icon />}
-                                <span style={{ marginLeft: '5px' }}>{type.charAt(0).toUpperCase() + type.slice(1)}</span>
+                                <span style={{ fontSize: "1 rem" }}>
+                                    {selectedReaction === type ? emoji : icon}
+                                </span>
+                                <span style={{ marginLeft: "5px" }}>{type.charAt(0).toUpperCase() + type.slice(1)}</span>
                             </span>
                         </Tooltip>
                     ))}
+                    {showPicker && (
+                        <div style={{ position: "absolute", zIndex: 1000 }}>
+                            <Picker onSelect={handleEmojiSelect} />
+                        </div>
+                    )}
                 </div>
             ) : (
                 <span>
                     {selectedReaction ? (
-                        React.createElement(reactions.find(r => r.type === selectedReaction)?.filledIcon || LikeOutlined, { style: { color: '#1890ff' } })
+                        <span style={{ fontSize: "1 rem", color: "#1890ff" }}>
+                            {reactions.find((r) => r.type === selectedReaction)?.emoji}
+                        </span>
                     ) : (
-                        <LikeOutlined />
+                        <span style={{ fontSize: "1 rem" }}>
+                            <LikeOutlined /> {/* Default icon when no reaction is selected */}
+                        </span>
                     )}
-                    <span style={{ marginLeft: '5px' }}>{selectedReaction ? selectedReaction.charAt(0).toUpperCase() + selectedReaction.slice(1) : 'Like'}</span>
+                    <span style={{ marginLeft: "5px" }}>
+                        {selectedReaction ? selectedReaction.charAt(0).toUpperCase() + selectedReaction.slice(1) : "Like"}
+                    </span>
                 </span>
             )}
         </div>

@@ -143,11 +143,68 @@ const sharePost = async (req, res) => {
     }
 };
 
+const renderPost = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+
+        if (!userId) {
+            return res.status(400).json({ message: 'User ID is required' });
+        }
+        const user = await User.findById(userId).populate('friends');
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const friendIds = Array.isArray(user.friends) ? user.friends.map(friend => friend._id) : [];
+
+        const posts = await Post.find({
+            $or: [
+                { ownerId: userId },
+                {
+                    ownerId: { $in: friendIds },
+                    visibility: 'friends'
+                },
+                { visibility: 'public' }
+            ]
+        })
+            .sort({ createdAt: -1 })
+            .limit(20);
+
+        res.status(200).json(posts);
+    } catch (error) {
+        console.error('Error fetching posts:', error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const getUser = async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        if (!userId) {
+            return res.status(400).json({ message: 'User ID is required' });
+        }
+
+        const user = await User.findById(userId, 'username avatarUrl');
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.status(201).json(user);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     createPost,
     reactToPost,
     commentOnPost,
     replyToComment,
     reactToComment,
-    sharePost
+    sharePost,
+    renderPost,
+    getUser,
 };

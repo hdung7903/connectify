@@ -4,33 +4,52 @@ import { UploadOutlined } from '@ant-design/icons';
 import Avatar from '../avatar/Avatar';
 import './postCreate.css';
 import useForm from '../../hooks/useForm';
+import api from '../../services/axios';
 
 export default function PostCreate({ onPost }) {
     const [values, handleChange, handleSubmit, setValues] = useForm(submitPost, { text: '', img: [] });
     const [fileList, setFileList] = useState([]);
 
-    function submitPost() {
-        const newPost = {
-            id: Date.now(),
-            userId: 1,
-            text: values.text,
-            images: values.img.map(img => URL.createObjectURL(img)),
-            likes_num: 0,
-            liked: false,
-            comments_num: 0,
-            created_at: new Date().toISOString()
-        };
+    const handleSubmitPost = async () => {
+        try {
+            const media = values.img.map(img => ({
+                type: 'image',
+                url: URL.createObjectURL(img),
+                thumbnailUrl: URL.createObjectURL(img),
+                size: img.size
+            }));
 
-        let existingPosts = JSON.parse(localStorage.getItem('posts')) || [];
-        existingPosts.push(newPost);
-        localStorage.setItem('posts', JSON.stringify(existingPosts));
+            const postData = {
+                title: "Your Post Title",
+                content: values.text,
+                media: media,
+                visibility: 'friends',
+                tags: []
+            };
 
-        if (onPost) {
-            onPost(newPost);
+            const response = await api.post("/posts/", postData, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('access_token')}`
+                }
+            });
+
+            if (response.status === 201) {
+                message.success('Post created successfully!');
+                if (onPost) {
+                    onPost(response.data);
+                }
+                setValues({ text: '', img: [] });
+                setFileList([]);
+            }
+        } catch (error) {
+            message.error('Failed to create post. Please try again.');
+            console.error(error);
         }
+    };
 
-        setValues({ text: '', img: [] });
-        setFileList([]);
+    function submitPost(event) {
+        event.preventDefault();
+        handleSubmitPost();
     }
 
     const handleImageChange = ({ fileList }) => {
@@ -73,7 +92,7 @@ export default function PostCreate({ onPost }) {
             </div>
         }>
             <div className="post-split"></div>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={submitPost}>
                 <Input.TextArea
                     rows={3}
                     name="text"

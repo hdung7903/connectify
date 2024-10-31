@@ -44,6 +44,7 @@ function AppRoute() {
                 <Route path="/suggestions" element={<AddFriend />} />
                 <Route path="/profile" element={<OwnerProfile />} />
                 <Route path="/profile/:id" element={<UserProfile />} />
+                <Route path="/posts/:id" element={<UserHomePage />} />
             </Route>
 
             {/* Admin routes */}

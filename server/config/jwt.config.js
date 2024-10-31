@@ -13,7 +13,7 @@ const generateAccessToken = (user) => {
         email: user.email,
         role: user.role
     }, ACCESS_TOKEN_SECRET,
-        { expiresIn: '15m' }
+        { expiresIn: '5h' }
     );
 };
     

@@ -34,7 +34,7 @@ export default function Home() {
 
     return (
         <Layout style={{ minHeight: '100vh', overflow: "hidden" }}>
-            <Sider width={250} theme="light" style={{
+            <Sider width={380} theme="light" style={{
                 overflow: 'auto',
                 height: '100vh',
                 position: 'fixed',
@@ -63,13 +63,13 @@ export default function Home() {
                     </Menu.Item>
                 </Menu>
             </Sider>
-            <Content width={250} style={{ marginLeft: 250, marginRight: 250, padding: '1rem', backgroundColor: '#fff', overflow: 'initial' }}>
+            <Content width={250} style={{ marginLeft: 380, marginRight: 380, padding: '1rem', backgroundColor: '#fff', overflow: 'initial' }}>
                 <div style={{ marginBottom: '1rem' }}>
                     <PostCreate onPost={handleNewPost} />
                 </div>
                 <Feed userId={userId} key={feedKey} newPost={newPost} />
             </Content>
-            <Sider width={250} style={{
+            <Sider width={380} style={{
                 overflow: 'auto',
                 height: '100vh',
                 position: 'fixed',
