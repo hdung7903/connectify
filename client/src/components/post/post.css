@@ -42,7 +42,14 @@
     color: gray;
     border: 1px solid gray;
     background-color: #f0f0f0;
+    border-radius: 4px;
+    padding: 8px;
 }
+
+.postCard .ant-modal {
+    max-width: 800px;
+}
+
 
 .comment-field {
     background-color: #f0f0f0;
@@ -69,4 +76,9 @@
 .profile-link:hover {
     text-decoration: underline;
     color: black;
+}
+
+.post-time {
+    font-size: 12px;
+    color: gray;
 }
