@@ -10,6 +10,7 @@ const authRouter = require('./routes/auth.route');
 const cookieParser = require('cookie-parser');
 const postRouter = require('./routes/post.route');
 const authMiddleware = require('./middleware/auth.middleware');
+const friendRouter = require('./routes/friend.route'); // Thêm router bạn bè
 const http = require('http');
 const initializeSocket = require('./config/socket.config');
 require('dotenv').config();
@@ -61,6 +62,8 @@ app.get('/', (req, res) => {
 app.use("/auth", authRouter);
 
 app.use('/posts', authMiddleware, postRouter);
+
+app.use('/friends', friendRouter);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
