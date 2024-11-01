@@ -143,6 +143,50 @@ const sharePost = async (req, res) => {
     }
 };
 
+// Lấy danh sách bài viết của người dùng hiện tại (người đăng nhập)
+const getMyPosts = async (req, res) => {
+    try {
+        const posts = await Post.find({ ownerId: req.user.userId }).sort({ createdAt: -1 });
+        if (posts.length === 0) {
+            return res.status(200).json({ message: 'You have not posted anything yet.' });
+        }
+        res.status(200).json(posts);
+    } catch (error) {
+        console.error("Error fetching user's own posts:", error);
+        res.status(500).json({ message: "An error occurred", error });
+    }
+};
+
+// Lấy bài viết của người dùng khác
+const getUserPosts = async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        // Kiểm tra nếu userId trùng với userId của người đang đăng nhập
+        if (userId === req.user.userId.toString()) {
+            return res.status(403).json({ message: 'Not allowed to access your own posts through this endpoint' });
+        }
+
+        // Tìm kiếm bài viết công khai của người dùng khác
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const posts = await Post.find({ ownerId: userId, visibility: 'public' }).sort({ createdAt: -1 });
+        
+        if (posts.length === 0) {
+            return res.status(200).json({ message: 'This user has no public posts' });
+        }
+
+        res.status(200).json(posts);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+
+
 const renderPost = async (req, res) => {
     try {
         const userId = req.user.userId;
@@ -205,6 +249,8 @@ module.exports = {
     replyToComment,
     reactToComment,
     sharePost,
+    getMyPosts,
+    getUserPosts,
     renderPost,
     getUser,
 };

@@ -8,7 +8,7 @@ const connectDB = require('./config/database');
 const path = require('path');
 const authRouter = require('./routes/auth.route');
 const cookieParser = require('cookie-parser');
-const postRouter = require('./routes/post.route');
+const postRoute = require('./routes/post.route');
 const authMiddleware = require('./middleware/auth.middleware');
 const friendRouter = require('./routes/friend.route'); // Thêm router bạn bè
 const http = require('http');
@@ -61,7 +61,7 @@ app.get('/', (req, res) => {
  */
 app.use("/auth", authRouter);
 
-app.use('/posts', authMiddleware, postRouter);
+app.use('/posts', authMiddleware, postRoute);
 
 app.use('/friends', friendRouter);
 
