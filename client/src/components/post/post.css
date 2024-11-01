@@ -69,13 +69,13 @@
 
 .profile-link {
     text-decoration: none;
-    color: black;
+    color: black !important;
     transition: text-decoration 0.2s ease;
 }
 
 .profile-link:hover {
     text-decoration: underline;
-    color: black;
+    color: black !important;
 }
 
 .post-time {
