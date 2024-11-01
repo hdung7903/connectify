@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Popover, Tooltip } from "antd";
 import { Picker } from "emoji-mart";
 import {
@@ -17,13 +17,27 @@ const reactions = [
     { type: "sad", emoji: "😢", icon: <FrownOutlined /> },
 ];
 
-export default function Reaction({ onReaction }) {
-    const [selectedReaction, setSelectedReaction] = useState(null);
+export default function Reaction({ onReaction, selectedReaction }) {
+    const [localSelectedReaction, setLocalSelectedReaction] = useState(selectedReaction);
+    const [visible, setVisible] = useState(false);
     const [showPicker, setShowPicker] = useState(false);
 
+    useEffect(() => {
+        setLocalSelectedReaction(selectedReaction);
+    }, [selectedReaction]);
+
+    const handleMouseEnter = () => {
+        setVisible(true);
+    };
+
+    const handleMouseLeave = () => {
+        setVisible(false);
+        setShowPicker(false);
+    };
+
     const handleReactionClick = (type) => {
-        const newReaction = selectedReaction === type ? null : type;
-        setSelectedReaction(newReaction);
+        const newReaction = localSelectedReaction === type ? null : type;
+        setLocalSelectedReaction(newReaction);
 
         if (onReaction) {
             onReaction(newReaction);
@@ -31,53 +45,52 @@ export default function Reaction({ onReaction }) {
     };
 
     const handleEmojiSelect = (emoji) => {
-        setSelectedReaction(emoji.id);
+        setLocalSelectedReaction(emoji.id);
         if (onReaction) {
             onReaction(emoji.id);
         }
         setShowPicker(false);
     };
 
-    const popoverContent = (
-        <div style={{ display: "flex", gap: "5px" }}>
-            {reactions.map(({ type, emoji, icon }) => (
-                <Tooltip title={type.charAt(0).toUpperCase() + type.slice(1)} key={type}>
-                    <span
-                        onClick={() => handleReactionClick(type)}
-                        style={{
-                            cursor: "pointer",
-                            display: "flex",
-                            alignItems: "center",
-                            fontSize: "1.5rem",
-                            color: selectedReaction === type ? "#1890ff" : "inherit",
-                        }}
-                    >
-                        {selectedReaction === type ? emoji : icon}
-                    </span>
-                </Tooltip>
-            ))}
-            {showPicker && (
-                <div style={{ position: "absolute", zIndex: 1000 }}>
-                    <Picker onSelect={handleEmojiSelect} />
+    return (
+        <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} style={{ cursor: "pointer" }}>
+            {visible ? (
+                <div style={{ display: "flex", gap: "5px" }}>
+                    {reactions.map(({ type, emoji, icon }) => (
+                        <Tooltip title={type.charAt(0).toUpperCase() + type.slice(1)} key={type}>
+                            <span
+                                onClick={() => handleReactionClick(type)}
+                                style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+                            >
+                                <span style={{ fontSize: "1rem" }}>
+                                    {localSelectedReaction === type ? emoji : icon}
+                                </span>
+                                <span style={{ marginLeft: "5px" }}>{type.charAt(0).toUpperCase() + type.slice(1)}</span>
+                            </span>
+                        </Tooltip>
+                    ))}
+                    {showPicker && (
+                        <div style={{ position: "absolute", zIndex: 1000 }}>
+                            <Picker onSelect={handleEmojiSelect} />
+                        </div>
+                    )}
                 </div>
+            ) : (
+                <span>
+                    {localSelectedReaction ? (
+                        <span style={{ fontSize: "1rem", color: "#1890ff" }}>
+                            {reactions.find((r) => r.type === localSelectedReaction)?.emoji}
+                        </span>
+                    ) : (
+                        <span style={{ fontSize: "1rem" }}>
+                            <LikeOutlined /> {/* Default icon when no reaction is selected */}
+                        </span>
+                    )}
+                    <span style={{ marginLeft: "5px" }}>
+                        {localSelectedReaction ? localSelectedReaction.charAt(0).toUpperCase() + localSelectedReaction.slice(1) : "Like"}
+                    </span>
+                </span>
             )}
         </div>
-    );
-
-    return (
-        <Popover content={popoverContent} trigger="hover" placement="top">
-            <span style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
-                {selectedReaction ? (
-                    <span style={{ fontSize: "1.5rem", color: "#1890ff" }}>
-                        {reactions.find((r) => r.type === selectedReaction)?.emoji}
-                    </span>
-                ) : (
-                    <LikeOutlined style={{ fontSize: "1.5rem" }} /> // Default icon when no reaction is selected
-                )}
-                <span style={{ marginLeft: "5px" }}>
-                    {selectedReaction ? selectedReaction.charAt(0).toUpperCase() + selectedReaction.slice(1) : "Like"}
-                </span>
-            </span>
-        </Popover>
     );
 }

@@ -30,7 +30,6 @@ const reactToPost = async (req, res) => {
             return res.status(404).json({ message: 'Post not found' });
         }
 
-        // Kiểm tra nếu người dùng đã thả cảm xúc thì cập nhật
         const existingReaction = post.reactions.find(
             (r) => r.userId.toString() === req.user.userId.toString()
         );
@@ -41,13 +40,14 @@ const reactToPost = async (req, res) => {
             post.reactions.push({ userId: req.user.userId, type: reactionType });
         }
 
+        post.reactsCount = post.reactions.filter(r => r.type !== null).length;
+
         await post.save();
-        res.status(200).json(post);
+        res.status(201).json(post);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
-
 
 // Thả cảm xúc cho bình luận
 const reactToComment = async (req, res) => {

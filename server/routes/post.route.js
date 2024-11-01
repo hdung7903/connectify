@@ -9,7 +9,6 @@ postRoute.post('/comment', commentOnPost);
 postRoute.post('/comment/react', reactToComment);
 postRoute.post('/reply', replyToComment);
 postRoute.post('/share', sharePost);
-postRoute.post('/comment/react', reactToComment);
 postRoute.get('/home', renderPost);
 postRoute.get('/user/:userId', getUser);
 
