@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { loginService, logoutService, meService } from '../services/auth.service';
 import api from '../services/axios';
+import Spinning from "../components/Spinning";
 
 const TOKEN_CHECK_INTERVAL = 1000;
 
@@ -32,26 +33,6 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const refreshAuth = async () => {
-        try {
-            const response = await refreshTokenService();
-            if (response.accessToken) {
-                localStorage.setItem('access_token', response.accessToken);
-                updateAxiosAuth(response.accessToken);
-                setAuthState(prev => ({
-                    ...prev,
-                    accessToken: response.accessToken,
-                    isAuthenticated: true,
-                }));
-                return true;
-            }
-            return false;
-        } catch (error) {
-            await handleLogout();
-            return false;
-        }
-    };
-
     useEffect(() => {
         const initAuth = async () => {
             try {
@@ -62,8 +43,7 @@ export const AuthProvider = ({ children }) => {
                 }
 
                 if (isTokenExpired(accessToken)) {
-                    const refreshSuccess = await refreshAuth();
-                    if (!refreshSuccess) throw new Error('Token refresh failed');
+                    throw new Error('Access token expired');
                 } else {
                     updateAxiosAuth(accessToken);
                 }
@@ -92,20 +72,6 @@ export const AuthProvider = ({ children }) => {
         initAuth();
     }, []);
 
-    useEffect(() => {
-        if (!authState.isAuthenticated) return;
-
-        const intervalId = setInterval(() => {
-            const accessToken = localStorage.getItem('access_token');
-            if (accessToken && isTokenExpired(accessToken)) {
-                refreshAuth();
-            }
-        }, TOKEN_CHECK_INTERVAL);
-
-        return () => clearInterval(intervalId);
-    }, [authState.isAuthenticated]);
-
-
     const login = async (credentials) => {
         try {
             const response = await loginService(credentials);
@@ -128,7 +94,6 @@ export const AuthProvider = ({ children }) => {
             return { success: false, message: error.message };
         }
     };
-
 
     const handleLogout = async () => {
         try {
@@ -161,14 +126,11 @@ export const AuthProvider = ({ children }) => {
         ...authState,
         login,
         logout: handleLogout,
-        refreshAuth,
     };
 
     if (authState.loading) {
-        return <div>Loading...</div>;
+        return <Spinning />;
     }
-
-
 
     return (
         <AuthContext.Provider value={contextValue}>

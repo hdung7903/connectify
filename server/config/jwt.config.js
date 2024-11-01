@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const RefreshToken = require('../models/refreshToken.model');
+const Token = require('../models/token.model');
 require('dotenv').config()
 
 // Secret keys for signing tokens
@@ -16,21 +16,12 @@ const generateAccessToken = (user) => {
         { expiresIn: '5h' }
     );
 };
-    
+
 const generateRefreshToken = async (user) => {
     const refreshToken = jwt.sign({
         userId: user._id,
     }, REFRESH_TOKEN_SECRET,
         { expiresIn: '7d' });
-
-    // Save the refresh token in the database
-    const tokenDocument = new RefreshToken({
-        userId: user._id,
-        token: refreshToken,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-    });
-
-    await tokenDocument.save();
     return refreshToken;
 };
 
@@ -42,24 +33,16 @@ const verifyAccessToken = (token) => {
     }
 };
 
-const verifyRefreshToken = async (token) => {
-    const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
-    const refreshToken = await RefreshToken.findOne({
-        token,
-        userId: decoded.userId,
-        isRevoked: false,
-        expiresAt: { $gt: new Date() }
-    });
-
-    if (!refreshToken) {
+const verifyRefreshToken = (token) => {
+    try {
+        return jwt.verify(token, REFRESH_TOKEN_SECRET);
+    } catch (err) {
         throw new Error('Invalid refresh token');
     }
-
-    return decoded;
 };
 
 const revokeRefreshToken = async (token) => {
-    await RefreshToken.findOneAndDelete({ token });
+    await Token.findOneAndDelete({ refreshToken: token });
 };
 
 module.exports = {

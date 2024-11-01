@@ -3,18 +3,16 @@ import api from './axios';
 export const loginService = async (values) => {
     try {
         const response = await api.post('/auth/login', values);
-
         if (response.status === 200) {
             const { accessToken } = response.data;
-
             localStorage.setItem('access_token', accessToken);
-
             return { accessToken };
         } else {
+            console.error('Login failed:', response.data);
             throw new Error(response.data.message || 'Login failed');
         }
     } catch (error) {
-        console.error('Login error:', error.stack);
+        console.error('Login error:', error);
         const errorMessage = error.response?.data?.message || 'Login failed';
         throw new Error(errorMessage);
     }
@@ -133,18 +131,6 @@ export const resendForgotPasswordService = async (email) => {
     }
 }
 
-export const refreshTokenService = async () => {
-    try {
-        const response = await api.post('/auth/refresh');
-        if (response.status === 200) {
-            return response.data;
-        }
-        throw new Error(response.data.message || "Failed to refresh token");
-    } catch (error) {
-        throw new Error(error.response?.data?.message || "Refresh token failed");
-    }
-};
-
 export const meService = async () => {
     try {
         const response = await api.get('/auth/me', {
@@ -154,35 +140,38 @@ export const meService = async () => {
         });
         if (response.status === 200) {
             return response.data;
-        }else{
+        } else {
             await logoutService();
+            return {
+                success: false,
+                message: response.data.message || 'Get user data failed',
+            };
         }
     } catch (error) {
         return {
             success: false,
-            message: error.response?.data?.message || "Get me data failed due to a network error",
+            message: error.response?.data?.message || 'Get user data failed due to a network error',
         };
     }
-}
+};
 
 export const logoutService = async () => {
     try {
-        const response = await api.post('/auth/logout', { refreshToken: localStorage.getItem('refresh_token') },
-            {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-                }
-            });
+        const response = await api.post('/auth/logout', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+            }
+        });
         if (response.status === 200) {
-            localStorage.clear();
-            return {success: true, message: "Logged out successfully"};
+            localStorage.removeItem('access_token');
+            return { success: true, message: 'Logged out successfully' };
         } else {
-            return { success: false, message: response.data.message || "Failed to logout" };
+            return { success: false, message: response.data.message || 'Failed to logout' };
         }
     } catch (error) {
         return {
             success: false,
-            message: error.response?.data?.message || "Logout failed due to a network error",
+            message: error.response?.data?.message || 'Logout failed due to a network error',
         };
     }
-}
+};

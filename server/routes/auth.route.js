@@ -8,7 +8,6 @@ const {
     resetPassword, 
     checkResetPasswordToken, 
     resendForgotPassword, 
-    refreshToken, 
     getMe, 
     logout 
 } = require('../controllers/auth.controller');
@@ -242,42 +241,6 @@ authRouter.post('/reset-password', resetPassword);
  *         description: User not found
  */
 authRouter.post('/resend-reset-password', resendForgotPassword);
-
-/**
- * @swagger
- * /auth/refresh:
- *   post:
- *     summary: Refresh access token
- *     tags: [Authentication]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - refreshToken
- *             properties:
- *               refreshToken:
- *                 type: string
- *     responses:
- *       200:
- *         description: New access token generated
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 accessToken:
- *                   type: string
- *                 refreshToken:
- *                   type: string
- *       401:
- *         description: Invalid refresh token
- */
-authRouter.post('/refresh', authMiddleware, refreshToken);
 
 /**
  * @swagger

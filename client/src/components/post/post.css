@@ -17,8 +17,8 @@
 
 .post-actions {
     display: flex;
-    justify-content: space-between;
-    padding: 10px 0;
+    justify-content: flex-end;
+    /* padding: 10px 0; */
 }
 
 .comment-button {
@@ -33,9 +33,9 @@
 }
 
 .view-all-comments {
-    color: gray;
+    color: #8c8c8c;
     cursor: pointer;
-    margin: 8px 0;
+    margin-bottom: 8px;
 }
 
 .postCard .ant-input {
@@ -81,4 +81,99 @@
 .post-time {
     font-size: 12px;
     color: gray;
+}
+
+.post-card {
+    margin-bottom: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.post-header {
+    
+}
+
+.more-actions {
+    font-size: 20px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.3s;
+}
+
+.more-actions:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.post-actions-menu .menu-item {
+    width: 100%;
+    text-align: left;
+    padding: 8px 16px;
+}
+
+.post-actions-menu .menu-item:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.post-stats {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    color: #8c8c8c;
+}
+
+.post-actions {
+    padding: 8px 16px;
+    display: flex;
+    justify-content: space-around;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.post-hidden {
+    padding: 10px;
+    text-align: center;
+    background-color: #fafafa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.comment-section {
+    padding: 16px;
+}
+
+
+.view-all-comments:hover {
+    text-decoration: underline;
+}
+
+.comment-input-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.comment-input-container .ant-input {
+    border-radius: 16px;
+    background-color: #f0f0f0;
+}
+
+.comments-modal .modal-content {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.modal-comment-input {
+    margin-top: 16px;
+}
+
+.modal-submit-button {
+    margin-top: 8px;
+}
+
+.ant-card {
+    padding: 0;
 }

@@ -1,19 +1,39 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Card, Row, Col, Modal, Input, Button, Popover, Typography } from 'antd';
+import { Card, Row, Col, Modal, Input, Button, Typography, Skeleton, Popover, Space } from 'antd';
 import Avatar from '../avatar/Avatar';
 import Reaction from '../interact/Reaction';
 import CommentButton from '../interact/CommentButton';
 import Comments from '../interact/Comments';
 import Slideshow from '../slideshow/Slideshow';
-import { ShareAltOutlined, SendOutlined, MoreOutlined, UndoOutlined } from '@ant-design/icons';
+import {
+    ShareAltOutlined,
+    SendOutlined,
+    MoreOutlined,
+    UndoOutlined,
+    GlobalOutlined,
+    TeamOutlined,
+    LockOutlined
+} from '@ant-design/icons';
 import './post.css';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const { Text, Paragraph } = Typography;
 
 export default function Post(props) {
-    const { id, ownerId, title, avatarUrl, content, media, likesCount, reactions, visibility, createdAt, updatedAt, username } = props;
-    const navigate = useNavigate();
+    const {
+        id,
+        ownerId,
+        title,
+        avatarUrl,
+        content,
+        media,
+        likesCount,
+        reactions,
+        visibility,
+        createdAt,
+        updatedAt,
+        username
+    } = props;
 
     const [state, setState] = useState({
         ...props,
@@ -23,246 +43,297 @@ export default function Post(props) {
         newComment: '',
         showModal: false,
         hidden: false,
+        selectedReaction: null,
     });
 
-    const [expanded, setExpanded] = useState(true);
+    const [expanded, setExpanded] = useState(false);
+    const [loading, setLoading] = useState(true);
     const inputRef = useRef(null);
 
-    // Fetch comments related to the post
     useEffect(() => {
         const fetchComments = async () => {
-            const postComments = await fakeData.comments.filter(comment => comment.postId === id);
-            setState(prevState => ({
-                ...prevState,
-                comments: postComments,
-                commentsLoaded: true
-            }));
+            try {
+                const response = await fetch(`/api/posts/${id}/comments`);
+                const postComments = await response.json();
+
+                setState(prevState => ({
+                    ...prevState,
+                    comments: postComments,
+                    commentsLoaded: true
+                }));
+            } catch (error) {
+                console.error('Error fetching comments:', error);
+            } finally {
+                setLoading(false);
+            }
         };
 
         fetchComments();
     }, [id]);
 
-    function handleReaction(reaction) {
-        const { selectedReaction, likesCount } = state;
+    const handleReaction = (reaction) => {
+        const { selectedReaction } = state;
 
-        if (selectedReaction === reaction) {
-            setState(prevState => ({
-                ...prevState,
-                selectedReaction: null,
-                likesCount: prevState.likesCount - 1,
-            }));
-        } else {
-            setState(prevState => ({
-                ...prevState,
-                selectedReaction: reaction,
-                likesCount: selectedReaction ? prevState.likesCount : prevState.likesCount + 1,
-            }));
-        }
-    }
-
-    function toggleComments() {
         setState(prevState => ({
             ...prevState,
-            showComments: !prevState.showComments
+            selectedReaction: selectedReaction === reaction ? null : reaction,
+            likesCount: selectedReaction === reaction
+                ? prevState.likesCount - 1
+                : selectedReaction
+                    ? prevState.likesCount
+                    : prevState.likesCount + 1,
         }));
-    }
+    };
 
-    function focusCommentInput() {
-        if (inputRef.current) {
-            inputRef.current.focus();
-        }
-    }
+    const focusCommentInput = () => {
+        inputRef.current?.focus();
+    };
 
-    function handleCommentChange(e) {
-        setState({ ...state, newComment: e.target.value });
-    }
+    const handleCommentChange = (e) => {
+        setState(prevState => ({
+            ...prevState,
+            newComment: e.target.value
+        }));
+    };
 
-    function submitComment() {
-        if (state.newComment.trim()) {
-            const newComment = {
-                id: state.comments.length + 1,
-                userId: 'user-id', // Replace with actual user ID
-                content: state.newComment,
-                reactions: [],
-            };
+    const submitComment = async () => {
+        if (!state.newComment.trim()) return;
+
+        try {
+            const response = await fakeData.comments.filter(comment => comment.postId === id);
+            const newComment = await response.json();
 
             setState(prevState => ({
                 ...prevState,
                 comments: [...prevState.comments, newComment],
                 newComment: ''
             }));
+        } catch (error) {
+            console.error('Error submitting comment:', error);
         }
-    }
+    };
 
-    function showAllComments() {
+    const showAllComments = () => {
         setState(prevState => ({
             ...prevState,
             showModal: true
         }));
-    }
+    };
 
-    function closeModal() {
+    const closeModal = () => {
         setState(prevState => ({
             ...prevState,
             showModal: false
         }));
-    }
+    };
 
-    function parseDateTime(time) {
+    const parseDateTime = (time) => {
         const now = Date.now();
         const createdTime = new Date(time).getTime();
         const diffInSeconds = Math.floor((now - createdTime) / 1000);
 
         if (diffInSeconds < 60) return "Just now";
-        if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minute${diffInSeconds === 60 ? '' : 's'}`;
-        if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hour${diffInSeconds / 3600 === 1 ? '' : 's'}`;
-        if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} day${diffInSeconds / 86400 === 1 ? '' : 's'}`;
-        if (diffInSeconds < 2419200) return `${Math.floor(diffInSeconds / 604800)} week${diffInSeconds / 604800 === 1 ? '' : 's'}`;
-        if (diffInSeconds < 29030400) return `${Math.floor(diffInSeconds / 2419200)} month${diffInSeconds / 2419200 === 1 ? '' : 's'}`;
-        return `${Math.floor(diffInSeconds / 29030400)} year${diffInSeconds / 29030400 === 1 ? '' : 's'} ago`;
-    }
+        if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} mins`;
+        if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours`;
+        if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days`;
+        return `${Math.floor(diffInSeconds / 604800)} weeks ago`;
+    };
 
-    function hidePost() {
+    const hidePost = () => {
         setState(prevState => ({
             ...prevState,
             hidden: true
         }));
-    }
+    };
 
-    function undoHidePost() {
+    const undoHidePost = () => {
         setState(prevState => ({
             ...prevState,
             hidden: false
         }));
-    }
+    };
+
+    const visibilityIcon = (visibilityType) => {
+        switch (visibilityType) {
+            case 'public':
+                return <GlobalOutlined />;
+            case 'friends':
+                return <TeamOutlined />;
+            case 'private':
+                return <LockOutlined />;
+            default:
+                return <GlobalOutlined />;
+        }
+    };
 
     const postActionsMenu = (
-        <div>
-            <div onClick={hidePost} style={{ padding: '8px 0' }}>Hide Post</div>
-            <div onClick={() => alert('Post reported')} style={{ padding: '8px 0' }}>Report Post</div>
+        <div className="post-actions-menu">
+            <Button type="text" onClick={hidePost} className="menu-item">Hide Post</Button>
+            <Button type="text" onClick={() => alert('Post reported')} className="menu-item">
+                Report Post
+            </Button>
         </div>
     );
 
-    const postContent = state.hidden ? (
-        <div className="post-hidden">
-            <span>This post is hidden</span>
-            <Button icon={<UndoOutlined />} onClick={undoHidePost} type="link" style={{ marginLeft: 'auto' }}>
-                Undo
-            </Button>
-        </div>
-    ) : (
-        <>
-            <Row justify="space-between" align="middle">
-                <Card.Meta
-                    avatar={<Avatar imgId={avatarUrl || 'https://placeholder.co/40x40'} />}
-                    title={
-                        <Link to={`/profile/${ownerId}`} className="profile-link">
-                            {username} {/* Ensure username is passed correctly */}
-                        </Link>
-                    }
-                    description={<div className="post-time">{parseDateTime(createdAt)}</div>}
-                />
-                <Popover content={postActionsMenu} trigger="click">
-                    <MoreOutlined style={{ fontSize: '20px', cursor: 'pointer' }} />
+    const renderPostHeader = () => (
+        <Row justify="space-between" align="middle" className="post-header">
+            <Card.Meta
+                avatar={
+                    loading ? (
+                        <Skeleton.Avatar active />
+                    ) : (
+                        <Avatar imgId={avatarUrl || 'https://placeholder.co/40x40'} />
+                    )
+                }
+                title={
+                    loading ? (
+                        <Skeleton.Input style={{ width: 200 }} active />
+                    ) : (
+                        <Link to={`/profile/${ownerId}`}>{username}</Link>
+                    )
+                }
+                description={
+                    loading ? (
+                        <Skeleton.Input style={{ width: 100 }} active />
+                    ) : (
+                        <Space>
+                            <Text>{parseDateTime(createdAt)}</Text>
+                            {visibilityIcon(visibility)}
+                        </Space>
+                    )
+                }
+            />
+            {!loading && (
+                <Popover content={postActionsMenu} trigger="click" placement="bottomRight">
+                    <MoreOutlined className="more-actions" />
                 </Popover>
-            </Row>
-            <Row>
-                <Col span={24}>
-                    <Paragraph ellipsis={{ rows: expanded ? 2 : undefined, expandable: false }}>
+            )}
+        </Row>
+    );
+
+    const renderPostContent = () => (
+        <>
+            {loading ? (
+                <Skeleton paragraph={{ rows: 3 }} active />
+            ) : (
+                <>
+                    <Paragraph
+                        ellipsis={{
+                            rows: expanded ? undefined : 3,
+                            expandable: true,
+                            symbol: 'more'
+                        }}
+                    >
                         {content}
                     </Paragraph>
-                    {content.length > 100 && (
-                        <Text
-                            type="secondary"
-                            style={{ cursor: 'pointer', color: '#1890ff' }}
-                            onClick={() => setExpanded(!expanded)}
-                        >
-                            {expanded ? 'Show more' : 'Show less'}
-                        </Text>
+                    {Array.isArray(media) && media.length > 0 && (
+                        <Slideshow images={media.map(item => item.url)} />
                     )}
-                    {Array.isArray(media) && media.length > 0 && <Slideshow images={media.map(item => item.url)} />}
-                </Col>
-            </Row>
-            <div className="post-stats">
-                <div className="post-stats-left">{likesCount} reactions</div>
-                <div className="post-stats-right">{state.comments.length} comments</div>
-            </div>
-            <div className="post-split"></div>
-            <div className="post-actions">
-                <Reaction onReaction={handleReaction} reactions={reactions} />
-                <span onClick={focusCommentInput} className="comment-button">
-                    <CommentButton>Comment</CommentButton>
-                </span>
-                <span className="share-button">
-                    <ShareAltOutlined />
-                    Share
-                </span>
-            </div>
-            <div className="post-split"></div>
-            <div>
-                {state.comments.length > 2 && (
-                    <div className="view-all-comments" onClick={showAllComments}>
-                        View all comments
-                    </div>
-                )}
-                {state.comments.length > 0 ? (
-                    <Comments comments={state.comments.slice(0, 2)} />
-                ) : null}
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-                <Avatar imgId={avatarUrl} />
-                <Input
-                    ref={inputRef}
-                    value={state.newComment}
-                    onChange={handleCommentChange}
-                    placeholder="Write a comment..."
-                    style={{ marginTop: '8px', marginLeft: '8px', backgroundColor: '#f0f0f0' }}
-                    suffix={
-                        <Button
-                            type="primary"
-                            icon={<SendOutlined />}
-                            onClick={submitComment}
-                        />
-                    }
-                />
-            </div>
+                </>
+            )}
         </>
     );
 
-    return (
-        <Card className="postCard" style={{ marginBottom: '16px' }}>
-            {postContent}
+    const renderPostStats = () => (
+        <div className="post-stats">
+            {loading ? (
+                <Skeleton.Input style={{ width: 200 }} active />
+            ) : (
+                <>
+                    <Space>{state.likesCount} Reactions</Space>
+                    <Space>{state.comments.length} Comments</Space>
+                </>
+            )}
+        </div>
+    );
 
-            <Modal
-                title={<div style={{ textAlign: 'center' }}>{`This post of ${username}`}</div>}
-                open={state.showModal}
-                onCancel={closeModal}
-                footer={null}
-                width={800}
-                style={{ maxHeight: '600px', overflowY: 'auto' }}
-            >
-                <Row align="middle" style={{ marginBottom: '16px' }}>
-                    <Col>
-                        <Avatar imgId={avatarUrl} />
-                        <Text strong style={{ marginLeft: '8px' }}>{username}</Text>
-                        <Text type="secondary" style={{ marginLeft: '8px' }}>{parseDateTime(createdAt)}</Text>
-                    </Col>
-                </Row>
-                <Paragraph>{content}</Paragraph>
-                {Array.isArray(media) && media.length > 0 && <Slideshow images={media.map(item => item.url)} />}
-                <div>
-                    <Comments comments={state.comments} />
-                    <Input.TextArea
-                        rows={4}
+    const renderPostActions = () => (
+        !loading && (
+            <div className="post-actions">
+                <Reaction
+                    onReaction={() => handleReaction('like')}
+                    reactions={reactions}
+                    selectedReaction={state.selectedReaction}
+                />
+                <CommentButton onClick={focusCommentInput} >Comment</CommentButton>
+                <Button icon={<ShareAltOutlined />} style={{ border: "none", background: "none" }}>Share</Button>
+            </div>
+        )
+    );
+
+    const renderCommentSection = () => (
+        !loading && (
+            <div className="comment-section">
+                {state.comments.length > 2 && (
+                    <div className="view-all-comments" onClick={showAllComments}>
+                        View all {state.comments.length} comments
+                    </div>
+                )}
+                <Comments comments={state.comments.slice(0, 2)} />
+                <div className="comment-input-container">
+                    <Avatar imgId={avatarUrl} size="small" />
+                    <Input
+                        ref={inputRef}
                         value={state.newComment}
                         onChange={handleCommentChange}
-                        placeholder="Add a comment..."
+                        placeholder="Write a comment..."
+                        suffix={
+                            <Button
+                                icon={<SendOutlined />}
+                                onClick={submitComment}
+                                type="text"
+                            />
+                        }
                     />
-                    <Button type="primary" onClick={submitComment} style={{ marginTop: '8px' }}>
-                        Submit Comment
-                    </Button>
                 </div>
-            </Modal>
-        </Card>
+            </div>
+        )
+    );
+
+    const renderHiddenPost = () => (
+        <div className="post-hidden">
+            <Text type="secondary">This post is hidden</Text>
+            <Button icon={<UndoOutlined />} onClick={undoHidePost} type="link">
+                Undo
+            </Button>
+        </div>
+    );
+
+    const renderCommentsModal = () => (
+        <Modal
+            title={`Comments on ${username}'s post`}
+            open={state.showModal}
+            onCancel={closeModal}
+            footer={null}
+            width={800}
+            className="comments-modal"
+        >
+            <div className="modal-content">
+                {renderPostContent()}
+                <Comments comments={state.comments} />
+                <Input.TextArea
+                    rows={4}
+                    value={state.newComment}
+                    onChange={handleCommentChange}
+                    placeholder="Write a comment..."
+                />
+                <Button icon={<SendOutlined />} onClick={submitComment} type="primary" block>
+                    Submit Comment
+                </Button>
+            </div>
+        </Modal>
+    );
+
+    return (
+        !state.hidden && (
+            <Card className="post" bordered={false}>
+                {renderPostHeader()}
+                {renderPostContent()}
+                {renderPostStats()}
+                {renderPostActions()}
+                {renderCommentSection()}
+                {renderCommentsModal()}
+            </Card>
+        )
     );
 }

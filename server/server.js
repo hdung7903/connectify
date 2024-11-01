@@ -9,16 +9,22 @@ const path = require('path');
 const authRouter = require('./routes/auth.route');
 const cookieParser = require('cookie-parser');
 const postRouter = require('./routes/post.route');
+const authMiddleware = require('./middleware/auth.middleware');
+const http = require('http');
+const initializeSocket = require('./config/socket.config');
 require('dotenv').config();
 
 const PORT = process.env.PORT || 9999
-const whitelist = [`${process.env.FRONTEND_URL}`,`${process.env.BACKEND_URL}`, undefined];
+const whitelist = [`${process.env.FRONTEND_URL}`, `${process.env.BACKEND_URL}`, undefined];
 const app = express();
+
+const server = http.createServer(app);
+
 
 app.use(morgan('dev'));
 app.use(cors({
     origin: function (origin, callback) {
-        if (!origin) return callback(null, true);        
+        if (!origin) return callback(null, true);
         if (whitelist.indexOf(origin) !== -1) {
             callback(null, true);
         } else {
@@ -38,6 +44,8 @@ app.use(express.urlencoded({ extended: false }));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+const io= initializeSocket(server);
+
 connectDB();
 
 app.get('/', (req, res) => {
@@ -52,7 +60,7 @@ app.get('/', (req, res) => {
  */
 app.use("/auth", authRouter);
 
-app.use('/posts', postRouter);
+app.use('/posts', authMiddleware, postRouter);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
@@ -63,7 +71,10 @@ app.use(async (req, res, next) => {
 
 app.use(async (err, req, res, next) => {
     res.status = err.status;
-    res.send({ message: { status: err.status, message: err.message } });
+    res.json({
+        message: err.message,
+        error: req.app.get('env') === 'development' ? err : {}
+    });
 });
 
 app.listen(PORT, () => {
