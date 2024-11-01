@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 const postSchema = new Schema({
     ownerId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     title: { type: String },
-    content: { type: String, required: true },
+    content: { type: String },
     media: [{
         type: { type: String, enum: ['image', 'video', 'link', 'audio'], default: 'image' },
         url: { type: String },
