@@ -1,6 +1,6 @@
 const express = require('express');
 const postRoute = express.Router();
-const { createPost, reactToPost, commentOnPost, replyToComment, sharePost, renderPost, getUser } = require('../controllers/post.controller');
+const { createPost, reactToPost, commentOnPost, replyToComment, sharePost, renderPost, getUser, getPostByUserId, getOwnerPost } = require('../controllers/post.controller');
 const { reactToComment } = require('../controllers/post.controller');
 
 postRoute.post('/', createPost);
@@ -11,5 +11,7 @@ postRoute.post('/reply', replyToComment);
 postRoute.post('/share', sharePost);
 postRoute.get('/home', renderPost);
 postRoute.get('/user/:userId', getUser);
+postRoute.get('/:userId', getPostByUserId);
+postRoute.get('/owner', getOwnerPost);
 
 module.exports = postRoute;

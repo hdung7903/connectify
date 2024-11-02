@@ -13,6 +13,7 @@ const authMiddleware = require('./middleware/auth.middleware');
 const friendRouter = require('./routes/friend.route'); // Thêm router bạn bè
 const http = require('http');
 const initializeSocket = require('./config/socket.config');
+const userRouter = require('./routes/user.route');
 require('dotenv').config();
 
 const PORT = process.env.PORT || 9999
@@ -45,7 +46,7 @@ app.use(express.urlencoded({ extended: false }));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-const io= initializeSocket(server);
+const io = initializeSocket(server);
 
 connectDB();
 
@@ -63,7 +64,9 @@ app.use("/auth", authRouter);
 
 app.use('/posts', authMiddleware, postRouter);
 
-app.use('/friends', friendRouter);
+app.use('/friends', authMiddleware, friendRouter);
+
+app.use("/users", authMiddleware, userRouter);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 

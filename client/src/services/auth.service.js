@@ -28,6 +28,7 @@ export const registerService = async (data) => {
             return { success: false, message: response.data.message || "Registration failed!" };
         }
     } catch (error) {
+        console.log(error);
         return {
             success: false,
             message: error.response?.data?.message || "Registration failed due to a network error",

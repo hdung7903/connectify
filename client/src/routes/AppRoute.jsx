@@ -41,7 +41,7 @@ function AppRoute() {
                 <Route index element={<GuestHomePage />} />
                 <Route path="/home" element={<UserHomePage />} />
                 <Route path="/message" element={<ChatPage />} />
-                <Route path="/suggestions" element={<AddFriend />} />
+                <Route path="/friends" element={<AddFriend />} />
                 <Route path="/profile" element={<OwnerProfile />} />
                 <Route path="/profile/:id" element={<UserProfile />} />
                 <Route path="/posts/:id" element={<UserHomePage />} />

@@ -4,19 +4,21 @@ const {
     acceptFriendRequest,
     rejectFriendRequest,
     cancelFriendRequest,
-    getFriends,
-    unfriend
+    unfriend,
+    getSuggestionFriends,
+    getFriendRequests,
+    getSentRequests,
 } = require('../controllers/friend.controller');
-const authMiddleware = require('../middleware/auth.middleware'); // Middleware xác thực
 
 const friendRouter = express.Router();
 
-// Các route liên quan đến bạn bè
-friendRouter.post('/send-request', authMiddleware, sendFriendRequest); // Gửi yêu cầu kết bạn
-friendRouter.post('/accept-request', authMiddleware, acceptFriendRequest); // Chấp nhận yêu cầu kết bạn
-friendRouter.post('/reject-request', authMiddleware, rejectFriendRequest); // Từ chối yêu cầu kết bạn
-friendRouter.post('/cancel-request', authMiddleware, cancelFriendRequest); // Hủy yêu cầu kết bạn
-friendRouter.get('/list', authMiddleware, getFriends); // Lấy danh sách bạn bè
-friendRouter.post('/unfriend', authMiddleware, unfriend); // Xóa bạn bè
+friendRouter.post('/send-request', sendFriendRequest);
+friendRouter.post('/accept-request', acceptFriendRequest);
+friendRouter.post('/reject-request', rejectFriendRequest);
+friendRouter.post('/cancel-request', cancelFriendRequest);
+friendRouter.post('/unfriend', unfriend);
+friendRouter.get('/suggestions', getSuggestionFriends);
+friendRouter.get('/requests', getFriendRequests);
+friendRouter.get('/sent-requests', getSentRequests);
 
 module.exports = friendRouter;

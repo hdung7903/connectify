@@ -5,11 +5,13 @@ const { generateAccessToken, generateRefreshToken, verifyRefreshToken, revokeRef
 const jwt = require('jsonwebtoken');
 const path = require('path');
 const ejs = require('ejs');
-const transporter = require('../config/transporter.js');
+const transporter = require('../config/transporter');
 const Token = require('../models/token.model.js');
 
 const createUser = async (req, res, next) => {
     const { username, email, password, gender, dob } = req.body;
+
+    console.log('req.body:', req.body);
 
     if (!username || !email || !password || !gender || !dob) {
         throw new createHttpError.BadRequest('Missing required fields');
@@ -40,13 +42,22 @@ const createUser = async (req, res, next) => {
             }
         });
 
-        await newUser.save();
+        const result = await newUser.save();
+        console.log('result:', result);
 
         const verificationLink = `${process.env.FRONTEND_URL}/verify/${verificationCode}/${email}`;
 
-        await sendVerificationEmail(username, email, verificationLink);
+        try {
+            await sendVerificationEmail(username, email, verificationLink);
+        } catch (emailError) {
+            console.error("Error sending verification email:", emailError);
+            return res.status(201).json({
+                message: 'User created successfully, but verification email could not be sent.',
+                error: emailError.message
+            });
+        }
 
-        res.status(201).json({
+        return res.status(201).json({
             message: 'User created successfully. Verification email sent.',
         });
     } catch (err) {
@@ -305,6 +316,7 @@ const getMe = async (req, res, next) => {
     try {
         const user = await User.findById(req.user.userId)
             .select('-passwordHash')
+            .populate('friends', 'username avatarUrl')
             .lean();
 
         if (!user) {
@@ -318,9 +330,11 @@ const getMe = async (req, res, next) => {
             gender: user.gender,
             dob: user.dob,
             avatarUrl: user.avatarUrl,
+            coverUrl: user.coverUrl,
             bio: user.bio,
             location: user.location,
             interests: user.interests,
+            friends: user.friends,
             role: user.role,
             accountVerification: user.accountVerification,
             createdAt: user.createdAt,

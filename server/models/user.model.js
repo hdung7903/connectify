@@ -65,7 +65,7 @@ const userSchema = new Schema({
     verifiedCode: { type: String },
     dob: { type: Date },
     avatarUrl: { type: String },
-    coverAvaUrl: { type: String },
+    coverUrl: { type: String },
     bio: { type: String },
     location: {
         city: String,

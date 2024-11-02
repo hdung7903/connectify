@@ -1,105 +1,245 @@
-import React, { act, useState } from 'react';
-import { Input, List, Button, Card, Typography, Row, Col, Space, Avatar } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Input, List, Button, Card, Typography, Row, Col, Space, Avatar, message } from 'antd';
 import { UserOutlined, UserAddOutlined, UsergroupAddOutlined, SearchOutlined } from '@ant-design/icons';
 import './AddFriend.css';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import api from '../../services/axios';
 
 const { Title, Text } = Typography;
 
 const AddFriend = () => {
+    const { user } = useAuth();
     const [activeTab, setActiveTab] = useState('1');
+    const [suggestionFriends, setSuggestionFriends] = useState([]);
+    const [friendRequests, setFriendRequests] = useState([]);
+    const [sentRequests, setSentRequests] = useState([]);
+    const [friends, setFriends] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [pagination, setPagination] = useState({
+        currentPage: 1,
+        totalPages: 1,
+        totalItems: 0,
+        hasMore: false
+    });
 
-    const renderFriendItem = (name, mutualFriends, imageSrc, buttons, key) => (
-        <List.Item key={key}>
-            <Card style={{ padding: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <Avatar size={80} src={imageSrc} icon={<UserOutlined />} />
-                    <div style={{ marginLeft: '16px', flex: 1 }}>
-                        <Link to={`/profile/1`} className="profile-link">
-                            {`${name}`}
+    const fetchSuggestions = async () => {
+        try {
+            const response = await api.get('/friends/suggestions', {
+                params: {
+                    page: pagination.currentPage,
+                    limit: 10
+                }
+            });
+            setSuggestionFriends(response.data.data);
+            setPagination(response.data.pagination);
+        } catch (error) {
+            console.error('Error fetching suggestions:', error);
+            message.error('Failed to fetch friend suggestions');
+            setSuggestionFriends([]);
+        }
+    };
+
+    const fetchRequests = async () => {
+        try {
+            const response = await api.get('/friends/requests', {
+                params: {
+                    page: pagination.currentPage,
+                    limit: 10
+                }
+            });
+            setFriendRequests(response.data.data);
+            setPagination(response.data.pagination);
+        } catch (error) {
+            console.error('Error fetching requests:', error);
+            message.error('Failed to fetch friend requests');
+            setFriendRequests([]);
+        }
+    };
+
+    const fetchSentRequests = async () => {
+        try {
+            const response = await api.get('/friends/sent-requests', {
+                params: {
+                    page: pagination.currentPage,
+                    limit: 10
+                }
+            });
+            setSentRequests(response.data.data);
+            setPagination(response.data.pagination);
+        } catch (error) {
+            console.error('Error fetching sent requests:', error);
+            message.error('Failed to fetch sent requests');
+            setSentRequests([]);
+        }
+    };
+
+    const fetchFriendsList = async () => {
+        const friendsList = user.friends;
+        setFriends(friendsList);
+    };
+
+    useEffect(() => {
+        switch (activeTab) {
+            case '1':
+                fetchRequests();
+                break;
+            case '2':
+                fetchSuggestions();
+                break;
+            case '3':
+                fetchSentRequests();
+                break;
+            case '4':
+                fetchFriendsList();
+                break;
+        }
+    }, [activeTab, pagination.currentPage]);
+
+    useEffect(() => {
+        if (activeTab === '4') {
+            fetchFriendsList();
+        }
+    }, [searchQuery]);
+
+    const handleAcceptRequest = async (requesterId) => {
+        try {
+            await api.post('/friends/accept-request', { requesterId });
+            message.success('Friend request accepted');
+            fetchRequests();
+            fetchFriendsList();
+        } catch (error) {
+            console.error('Error accepting friend request:', error);
+            message.error('Failed to accept friend request');
+        }
+    };
+
+    const handleRejectRequest = async (requesterId) => {
+        try {
+            await api.post('/friends/reject-request', { requesterId });
+            message.success('Friend request rejected');
+            fetchRequests();
+        } catch (error) {
+            console.error('Error rejecting friend request:', error);
+            message.error('Failed to reject friend request');
+        }
+    };
+
+    const handleSendRequest = async (recipientId) => {
+        try {
+            await api.post('/friends/send-request', { recipientId });
+            message.success('Friend request sent');
+            fetchSuggestions();
+            fetchSentRequests();
+        } catch (error) {
+            console.error('Error sending friend request:', error);
+            message.error('Failed to send friend request');
+        }
+    };
+
+    const handleCancelRequest = async (recipientId) => {
+        try {
+            await api.post('/friends/cancel-request', { recipientId });
+            message.success('Friend request cancelled');
+            fetchSentRequests();
+            fetchSuggestions();
+        } catch (error) {
+            console.error('Error cancelling friend request:', error);
+            message.error('Failed to cancel friend request');
+        }
+    };
+
+    const handleUnfriend = async (friendId) => {
+        try {
+            await api.post('/friends/unfriend', { friendId });
+            message.success('Unfriended successfully');
+            fetchFriendsList();
+            fetchSuggestions();
+        } catch (error) {
+            console.error('Error unfriending:', error);
+            message.error('Failed to unfriend');
+        }
+    };
+
+    const renderFriendItem = (item) => (
+        <List.Item key={item._id}>
+            <Card style={{ width: '100%', padding: '12px' }}>
+                <Space style={{ display: 'flex' }} >
+                    <Avatar
+                        size={80}
+                        src={item.avatarUrl}
+                        icon={!item.avatarUrl && <UserOutlined />}
+                    />
+                    <Space style={{ marginLeft: '16px', flex: 1 }} direction='vertical'>
+                        <Link to={`/profile/${item._id}`} className="profile-link">
+                            <Text strong>{item.username}</Text>
                         </Link>
-                        <div>
-                            <Text type="secondary">{mutualFriends} mutual friends</Text>
-                        </div>
+                        {item.bio && <Text style={{ display: 'block', margin: '4px 0' }}>{item.bio}</Text>}
                         <Space style={{ marginTop: '8px' }}>
-                            {buttons.map((button, index) => React.cloneElement(button, { key: index }))}
+                            {activeTab === '1' && (
+                                <Space>
+                                    <Button
+                                        type="primary"
+                                        onClick={() => handleAcceptRequest(item._id)}
+                                    >
+                                        Accept
+                                    </Button>
+                                    <Button
+                                        onClick={() => handleRejectRequest(item._id)}
+                                    >
+                                        Reject
+                                    </Button>
+                                </Space>
+                            )}
+                            {activeTab === '2' && (
+                                <Space direction='vertical'>
+                                    <Button
+                                        type="primary"
+                                        icon={<UserAddOutlined />}
+                                        onClick={() => handleSendRequest(item._id)}
+                                    >
+                                        Add Friend
+                                    </Button>
+                                </Space>
+                            )}
+                            {activeTab === '3' && (
+                                <Space direction='vertical'>
+                                    <Button
+                                        onClick={() => handleCancelRequest(item._id)}
+                                    >
+                                        Cancel Request
+                                    </Button>
+                                </Space>
+                            )}
+                            {activeTab === '4' && (
+                                <Space direction='vertical'>
+                                    <Button
+                                        danger
+                                        onClick={() => handleUnfriend(item._id)}
+                                    >
+                                        Unfriend
+                                    </Button>
+                                </Space>
+                            )}
                         </Space>
-                    </div>
-                </div>
+                    </Space>
+                </Space>
             </Card>
         </List.Item>
     );
 
-    const friendRequests = [
-        { id: 'fr1', name: 'John Doe', mutualFriends: 5, imageSrc: 'https://placeholder.co/80x80' },
-        { id: 'fr2', name: 'Jane Smith', mutualFriends: 3, imageSrc: 'https://placeholder.co/80x80' },
-    ];
-
-    const suggestions = [
-        { id: 's1', name: 'Alice Johnson', mutualFriends: 8, imageSrc: 'https://placeholder.co/80x80' },
-        { id: 's2', name: 'Bob Williams', mutualFriends: 2, imageSrc: 'https://placeholder.co/80x80' },
-    ];
-
-    const friends = [
-        { id: 'f1', name: 'Emily Brown', mutualFriends: 15, imageSrc: 'https://placeholder.co/80x80' },
-        { id: 'f2', name: 'Michael Davis', mutualFriends: 7, imageSrc: 'https://placeholder.co/80x80' },
-    ];
-
-    const renderContent = () => {
+    const getDataSource = () => {
         switch (activeTab) {
             case '1':
-                return (
-                    <List
-                        itemLayout="vertical"
-                        dataSource={friendRequests}
-                        renderItem={(item) => renderFriendItem(
-                            item.name,
-                            item.mutualFriends,
-                            item.imageSrc,
-                            [
-                                <Button type="primary">Confirm</Button>,
-                                <Button>Delete</Button>
-                            ],
-                            item.id
-                        )}
-                    />
-                );
+                return friendRequests;
             case '2':
-                return (
-                    <List
-                        itemLayout="vertical"
-                        dataSource={suggestions}
-                        renderItem={(item) => renderFriendItem(
-                            item.name,
-                            item.mutualFriends,
-                            item.imageSrc,
-                            [
-                                <Button type="primary" icon={<UserAddOutlined />}>Add Friend</Button>,
-                                <Button>Remove</Button>
-                            ],
-                            item.id
-                        )}
-                    />
-                );
+                return suggestionFriends;
             case '3':
-                return (
-                    <List
-                        itemLayout="vertical"
-                        dataSource={friends}
-                        renderItem={(item) => renderFriendItem(
-                            item.name,
-                            item.mutualFriends,
-                            item.imageSrc,
-                            [
-                                <Button type="primary">Message</Button>,
-                                <Button danger>Unfriend</Button>
-                            ],
-                            item.id
-                        )}
-                    />
-                );
+                return sentRequests;
+            case '4':
+                return friends;
             default:
-                return null;
+                return [];
         }
     };
 
@@ -113,13 +253,18 @@ const AddFriend = () => {
                         dataSource={[
                             { icon: <UserAddOutlined />, text: 'Friend Requests', key: '1' },
                             { icon: <UsergroupAddOutlined />, text: 'Suggestions', key: '2' },
-                            { icon: <UserOutlined />, text: 'All Friends', key: '3' },
+                            { icon: <UserAddOutlined />, text: 'Sent Requests', key: '3' },
+                            { icon: <UserOutlined />, text: 'All Friends', key: '4' },
                         ]}
                         renderItem={(item) => (
                             <List.Item
-                                key={item.key}
                                 onClick={() => setActiveTab(item.key)}
-                                style={{ cursor: 'pointer', backgroundColor: activeTab === item.key ? '#e6f7ff' : 'transparent' }}
+                                style={{
+                                    cursor: 'pointer',
+                                    backgroundColor: activeTab === item.key ? '#e6f7ff' : 'transparent',
+                                    padding: '8px 16px',
+                                    borderRadius: '4px'
+                                }}
                             >
                                 <Space>
                                     {item.icon}
@@ -131,19 +276,35 @@ const AddFriend = () => {
                 </Card>
             </Col>
             <Col xs={24} sm={16} md={18} lg={19} xl={20}>
-                {
-                    activeTab === '3' && (
-                        <Card
-                            title={<Input prefix={<SearchOutlined />} placeholder="Search Friends" />}
-                            style={{ marginBottom: '16px' }}
+                {activeTab === '4' && (
+                    <Card style={{ marginBottom: '16px' }}>
+                        <Input
+                            prefix={<SearchOutlined />}
+                            placeholder="Search Friends"
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            value={searchQuery}
                         />
-                    )
-                }
+                    </Card>
+                )}
                 <Card>
                     <Title level={4}>
-                        {activeTab === '1' ? 'Friend Requests' : activeTab === '2' ? 'Suggestions' : 'All Friends'}
+                        {activeTab === '1' ? 'Friend Requests' :
+                            activeTab === '2' ? 'Suggestions' :
+                                activeTab === '3' ? 'Sent Requests' :
+                                    'All Friends'}
                     </Title>
-                    {renderContent()}
+                    <List
+                        itemLayout="vertical"
+                        dataSource={getDataSource()}
+                        renderItem={renderFriendItem}
+                        pagination={pagination.totalPages > 1 ? {
+                            current: pagination.currentPage,
+                            total: pagination.totalItems,
+                            pageSize: 10,
+                            onChange: (page) => setPagination(prev => ({ ...prev, currentPage: page }))
+                        } : false}
+                        locale={{ emptyText: 'No data available' }}
+                    />
                 </Card>
             </Col>
         </Row>
