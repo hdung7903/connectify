@@ -55,7 +55,7 @@ const { Schema } = mongoose;
 const postSchema = new Schema({
     ownerId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     title: { type: String },
-    content: { type: String },
+    content: { type: String, required: true },
     media: [{
         type: { type: String, enum: ['image', 'video', 'link', 'audio'], default: 'image' },
         url: { type: String },
@@ -64,7 +64,7 @@ const postSchema = new Schema({
     }],
     tags: [{ type: String }],
     visibility: { type: String, enum: ['public', 'friends', 'private'], default: 'public' },
-    reactsCount: { type: Number, default: 0 },
+    likesCount: { type: Number, default: 0 },
     sharesCount: { type: Number, default: 0 },
     reactions: [{
         userId: { type: Schema.Types.ObjectId, ref: 'User' },
