@@ -222,6 +222,54 @@ const renderPost = async (req, res) => {
     }
 };
 
+const getOwnerPost = async (req, res, next) => {
+    try {
+        const userId = req.user.userId;
+        const skip = parseInt(req.query.skip) || 0;
+        const limit = parseInt(req.query.limit) || 10;
+
+        const user = await User.findById(userId).select('username').lean().exec();
+
+        const posts = await Post.find({ ownerId: userId })
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .lean() // Add lean() for better performance
+            .exec();
+
+        const modifiedPosts = posts.map(post => ({
+            ...post,
+            ownerId: {
+                _id: user._id,
+                username: user.username,
+            }
+        }));
+
+        console.log('Modified posts:', modifiedPosts);
+
+        res.status(200).json(modifiedPosts);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const getPostByUserId = async (req, res, next) => {
+    try {
+        const userId = req.user.userId;
+        const findUserById = await User.findById(userId);
+        if (!findUserById) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        const posts = await Post.find({ ownerId: userId });
+        if (!posts) {
+            return res.status(404).json({ message: 'Posts not found' });
+        }
+        res.status(200).json(posts);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 const getUser = async (req, res) => {
     try {
         const { userId } = req.params;
@@ -252,5 +300,7 @@ module.exports = {
     getMyPosts,
     getUserPosts,
     renderPost,
+    getOwnerPost,
+    getPostByUserId,
     getUser,
 };

@@ -5,7 +5,7 @@ import Reaction from '../interact/Reaction';
 import CommentButton from '../interact/CommentButton';
 import Comments from '../interact/Comments';
 import Slideshow from '../slideshow/Slideshow';
-import { ShareAltOutlined, SendOutlined, MoreOutlined, UndoOutlined } from '@ant-design/icons';
+import { ShareAltOutlined, SendOutlined, MoreOutlined, UndoOutlined, UsergroupAddOutlined, LockOutlined, GlobalOutlined } from '@ant-design/icons';
 import './post.css';
 import api from '../../services/axios';
 import { Link, useNavigate } from 'react-router-dom';
@@ -171,6 +171,19 @@ export default function Post(props) {
         }));
     }
 
+    const visibilityIcon = (visibility) => {
+        switch (visibility) {
+            case 'public':
+                return <GlobalOutlined />;
+            case 'friends':
+                return <UsergroupAddOutlined />;
+            case 'private':
+                return <LockOutlined />;
+            default:
+                return null;
+        }
+    }
+
     const postActionsMenu = (
         <div>
             <div onClick={hidePost} style={{ padding: '8px 0' }}>Hide Post</div>
@@ -195,7 +208,7 @@ export default function Post(props) {
                             <Text strong><Link to={`/profile/${ownerId}`} className="profile-link">
                                 {username}
                             </Link></Text>
-                            <Text type="secondary" style={{ display: 'block' }}>{parseDateTime(createdAt)}</Text>
+                            <Text type="secondary" style={{ display: 'block' }}>{parseDateTime(createdAt)}{visibilityIcon(visibility)}</Text>
                         </div>
                     </Col>
                 </Row>

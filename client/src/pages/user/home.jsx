@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layout, Menu, Avatar, Typography, Badge, Space } from 'antd';
+import { Layout, Menu, Avatar, Typography, Badge, Space, List } from 'antd';
 import {
     UserOutlined,
     TeamOutlined,
@@ -9,6 +9,8 @@ import {
 import Feed from '../../components/feed/Feed';
 import PostCreate from '../../components/postCreate/postCreate';
 import './home.css';
+import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const { Content, Sider } = Layout;
 const { Title, Text } = Typography;
@@ -17,20 +19,16 @@ export default function Home() {
     const [feedKey, setFeedKey] = useState(0);
     const [newPost, setNewPost] = useState(null);
     const userId = null;
+    const { user } = useAuth();
+    const navigate = useNavigate();
+
+    console.log(user.friends);
 
     const handleNewPost = (post) => {
         setNewPost(post);
         setFeedKey(feedKey + 1);
     };
 
-    // Mock data for friends
-    const friends = [
-        { id: 1, name: 'Alice Johnson' },
-        { id: 2, name: 'Bob Smith' },
-        { id: 3, name: 'Charlie Brown' },
-        { id: 4, name: 'Diana Ross' },
-        { id: 5, name: 'Ethan Hunt' },
-    ];
 
     return (
         <Layout style={{ minHeight: '100vh', overflow: "hidden" }}>
@@ -45,16 +43,16 @@ export default function Home() {
                 scrollbarGutter: 'stable',
             }}>
                 <Menu mode="inline" defaultSelectedKeys={['1']} style={{ marginTop: "10px" }}>
-                    <Menu.Item key="0" icon={<Avatar size={30} icon={<UserOutlined />} />}>
-                        <Text level={4} style={{ margin: '0.5rem 0' }}>aa</Text>
+                    <Menu.Item key="0" icon={<Avatar size={30} icon={<UserOutlined />} />} onClick={() => navigate("/profile")}>
+                        <Text level={4} style={{ margin: '0.5rem 0' }}>{user.username}</Text>
                     </Menu.Item>
-                    <Menu.Item key="1" icon={<HomeOutlined />}>
+                    <Menu.Item key="1" icon={<HomeOutlined />} onClick={() => navigate("/home")}>
                         <Text level={4} style={{ margin: '0.5rem 0' }}>Home</Text>
                     </Menu.Item>
-                    <Menu.Item key="2" icon={<TeamOutlined />}>
+                    <Menu.Item key="2" icon={<TeamOutlined />} onClick={() => navigate("/friends")}>
                         <Space style={{ display: 'flex', justifyContent: 'space-between', alignContent: "flex-end" }}>
                             <Text level={4} style={{ margin: '0.5rem 0' }}>Friends</Text>
-                            <Badge count={11} overflowCount={10} color="#faad14" />
+                            <Badge count={user.friendNotification} overflowCount={10} color="#faad14" />
                         </Space>
                     </Menu.Item>
                     <Menu.Item key="3" icon={<TeamOutlined />}>Groups</Menu.Item>
@@ -83,9 +81,12 @@ export default function Home() {
                 theme="light">
                 <Title level={4}><UserOutlined /> Friends</Title>
                 <Menu mode="inline">
-                    {friends.map(friend => (
-                        <Menu.Item key={friend.id} icon={<UserOutlined />}>
-                            {friend.name}
+                    {user.friends.map(friend => (
+                        <Menu.Item key={friend._id}>
+                            <Space onClick={() => navigate(`/profile/${friend._id}`)}>
+                                <Avatar src={(friend.avatarUrl && friend.avatarUrl !== "") ? friend.avatarUrl : "http://placeholder.co/160x160"} alt="avatar" />
+                                {friend.username}
+                            </Space>
                         </Menu.Item>
                     ))}
                 </Menu>

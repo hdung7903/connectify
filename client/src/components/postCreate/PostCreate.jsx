@@ -7,11 +7,15 @@ import useForm from '../../hooks/useForm';
 import api from '../../services/axios';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { storage } from '../../firebase/config';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function PostCreate({ onPost }) {
     const [values, handleChange, handleSubmit, setValues] = useForm(submitPost, { text: '', img: [] });
     const [fileList, setFileList] = useState([]);
     const [uploading, setUploading] = useState(false);
+    const {user}=useAuth();
+
+    const avatar=(user.avatarUrl||user.avatarUrl!=="")?user.avatarUrl:"http://placehold.it/160x160";
 
     const uploadImageToFirebase = async (files) => {
         if (!files || files.length === 0) return [];
@@ -136,7 +140,7 @@ export default function PostCreate({ onPost }) {
     return (
         <Card className="PostCreate" title={
             <div style={{ display: 'flex', alignItems: 'center' }}>
-                <Avatar imgId="https://xsgames.co/randomusers/avatar.php?g=male" />
+                <Avatar src={<img src={avatar} alt='avatar'/>} />
                 <span style={{ marginLeft: '10px' }}>Write a new post</span>
             </div>
         }>
@@ -151,6 +155,7 @@ export default function PostCreate({ onPost }) {
                     className="PostCreate-input-text"
                     aria-label="Post content"
                     disabled={uploading}
+                    variant="borderless"
                 />
                 <Upload
                     name="img"

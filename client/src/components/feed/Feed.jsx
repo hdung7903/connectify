@@ -62,7 +62,7 @@ export default function Feed() {
     if (loading) return <p>Loading feed...</p>;
 
     return (
-        <div>
+        <div style={{margin:"10px 0"}}>
             {posts.length > 0 ? (
                 posts.map(post => (
                     <Post
@@ -82,6 +82,7 @@ export default function Feed() {
                         avatarUrl={post.avatarUrl}
                         comments={post.comments}
                         refreshPosts={refreshPosts}
+                        
                     />
                 ))
             ) : (
