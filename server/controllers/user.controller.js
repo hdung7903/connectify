@@ -20,6 +20,64 @@ const getUser = async (req, res, next) => {
     }
 };
 
+const updateAvatar = async (req, res, next) => {
+    try {
+        const { avatarUrl } = req.body;
+        const userId = req.user.userId;
+
+        if (!avatarUrl) {
+            throw createHttpError.BadRequest('Avatar URL is required');
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            throw createHttpError.NotFound('User not found');
+        }
+
+        // Update avatar URL
+        user.avatarUrl = avatarUrl;
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Avatar updated successfully',
+            avatarUrl: user.avatarUrl
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const updateCover = async (req, res, next) => {
+    try {
+        const { coverUrl } = req.body;
+        const userId = req.user.userId;
+
+        if (!coverUrl) {
+            throw createHttpError.BadRequest('Cover URL is required');
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            throw createHttpError.NotFound('User not found');
+        }
+
+        // Update cover URL
+        user.coverUrl = coverUrl;
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Cover photo updated successfully',
+            coverUrl: user.coverUrl
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     getUser,
+    updateAvatar,
+    updateCover
 };

@@ -8,6 +8,7 @@ const {
     getSuggestionFriends,
     getFriendRequests,
     getSentRequests,
+    getFriendsList,
 } = require('../controllers/friend.controller');
 
 const friendRouter = express.Router();
@@ -20,5 +21,6 @@ friendRouter.post('/unfriend', unfriend);
 friendRouter.get('/suggestions', getSuggestionFriends);
 friendRouter.get('/requests', getFriendRequests);
 friendRouter.get('/sent-requests', getSentRequests);
+friendRouter.get('/list', getFriendsList);
 
 module.exports = friendRouter;

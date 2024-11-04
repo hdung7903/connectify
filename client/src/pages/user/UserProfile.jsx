@@ -1,39 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Avatar, Button, Row, Col, Divider, Typography, Image, Form, Input, List, Space, message, Upload, Popover, Tabs, Modal } from 'antd';
-import { UserOutlined, EditOutlined, CameraOutlined, SettingOutlined, FileImageOutlined, PictureOutlined } from '@ant-design/icons';
-import moment from 'moment';
+import { Card, Avatar, Button, Row, Col, Typography, Image, Input, List, Space, message, Upload, Popover, Tabs, Modal } from 'antd';
+import { UserOutlined, EditOutlined, SettingOutlined, PictureOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../services/axios';
 import { useAuth } from '../../contexts/AuthContext';
-import ImgCrop from 'antd-img-crop';
-import IntroCard from '../../components/profile/BioCard';
 import FriendList from '../../components/profile/FriendList';
 import PostCreate from '../../components/postCreate/postCreate';
-import Feed from '../../components/feed/Feed';
+import Post from '../../components/post/Post';
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
-
-const tabs = [
-    {
-        key: "1",
-        label: "Posts",
-    },
-    {
-        key: "2",
-        label: "About",
-    },
-    {
-        key: "3",
-        label: "Friends",
-    },
-    {
-        key: "4",
-        label: "Photos",
-    }
-
-];
-
 const UserProfile = () => {
 
     const { id } = useParams();
@@ -48,6 +24,9 @@ const UserProfile = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [feedKey, setFeedKey] = useState(0);
     const [newPost, setNewPost] = useState(null);
+    const [friendsModel, setFriendsModel] = useState(false);
+
+    const [userPost, setUserPost] = useState(null);
 
     const fetchUser = async () => {
         try {
@@ -71,11 +50,27 @@ const UserProfile = () => {
         }
     };
 
+    const fetchUserPost = async () => {
+        try {
+            const response = await api.get(`/posts/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('access_token')}`
+                }
+            });
+            console.log(response.data ?? "No user post found");
+            setUserPost(response.data);
+        } catch (error) {
+            console.error('Error fetching user post:', error);
+            message.error('Error fetching user post');
+        }
+    };
+
     useEffect(() => {
         if (id === user.userId) {
             navigate('/profile');
         } else {
             fetchUser();
+            fetchUserPost();
         }
         return () => {
             console.log('cleanup');
@@ -88,46 +83,6 @@ const UserProfile = () => {
         setFeedKey(feedKey + 1);
     };
 
-    const beforeUpload = (file) => {
-        const isImage = file.type.startsWith('image/');
-        if (!isImage) {
-            message.error(`${file.name} is not an image file`);
-            return Upload.LIST_IGNORE;
-        }
-
-        const isLt5M = file.size / 1024 / 1024 < 5;
-        if (!isLt5M) {
-            message.error('Image must be smaller than 5MB!');
-            return Upload.LIST_IGNORE;
-        }
-
-        const fileExists = fileList.some(existingFile => existingFile.name === file.name && existingFile.size === file.size);
-        if (fileExists) {
-            return Upload.LIST_IGNORE;
-        }
-
-        setFileList(prevList => [...prevList, {
-            uid: file.uid,
-            name: file.name,
-            status: 'done',
-            url: URL.createObjectURL(file),
-            originFileObj: file
-        }]);
-        return false;
-    };
-
-    const handleImageChange = ({ fileList }) => {
-        const files = fileList.map(file => file.originFileObj);
-        handleChange({ name: 'img', value: files });
-        setAvatar(fileList);
-    };
-
-    const handleRemove = (file) => {
-        setAvatar(prevList => prevList.filter(item => item.uid !== file.uid));
-        const updatedImages = values.img.filter(img => img !== file.originFileObj);
-        setValues({ ...values, img: updatedImages });
-    };
-
     const handleAvatarClick = () => {
         setIsModalOpen(true);
     };
@@ -137,17 +92,6 @@ const UserProfile = () => {
             size="small">
             <List.Item>
                 <Space direction="vertical">
-                    <ImgCrop showGrid quality={1} zoomSider={false} cropShape='round' maxZoom={2.5}>
-                        <Upload
-                            name="avatar"
-                            className="avatar-uploader"
-                            showUploadList={false}
-                            onChange={handleImageChange}
-                            onRemove={handleRemove}
-                        >
-                            <Button icon={<FileImageOutlined />}>Update Avatar</Button>
-                        </Upload>
-                    </ImgCrop>
                     <Button icon={<PictureOutlined />} onClick={handleAvatarClick}>View Avatar</Button>
                 </Space>
             </List.Item>
@@ -162,29 +106,12 @@ const UserProfile = () => {
             <Card
                 cover={
                     <div style={{ position: 'relative' }}>
-
                         <Image
                             src={`${cover[0].url}`}
                             style={{ objectFit: 'cover', height: 300, width: '100%' }}
                             preview={false}
                             alt="Cover Photo"
                         />
-                        <ImgCrop showGrid quality={1} zoomSider={false} aspect={3 / 1}>
-                            <Upload
-                                name="cover"
-                                className="cover-uploader"
-                                showUploadList={false}
-                                onChange={handleImageChange}
-                                onRemove={handleRemove}
-                            >
-                                <Button
-                                    style={{ position: 'absolute', bottom: 16, right: 16 }}
-                                    icon={<CameraOutlined />}
-                                >
-                                    Edit Cover Photo
-                                </Button>
-                            </Upload>
-                        </ImgCrop>
                     </div>
                 }
                 bordered={false}
@@ -200,7 +127,11 @@ const UserProfile = () => {
                         <Title level={2}>{userData?.username}</Title>
                         <Row gutter={16} style={{ marginTop: 40 }}>
                             <Col>
-                                <Button type="primary" icon={<EditOutlined />}>Edit Profile</Button>
+                                {
+                                    userPost?.relationship === "friend" ?
+                                        <Button icon={<UserOutlined />}>Friend</Button> :
+                                        <Button type="primary" icon={<EditOutlined />}>Add Friend</Button>
+                                }
                             </Col>
                             <Col>
                                 <Button icon={<SettingOutlined />}>Account Settings</Button>
@@ -208,20 +139,66 @@ const UserProfile = () => {
                         </Row>
                     </Col>
                 </Row>
-                <Tabs defaultActiveKey="1" type="card" style={{ marginTop: 20 }} items={tabs} />
+
             </Card>
 
             <Row gutter={16} style={{ marginTop: 20 }}>
                 <Col xs={24} md={8}>
-                    <IntroCard bio={userData?.bio} city={userData?.location.city} country={userData?.location.country} />
-                    <FriendList friends={userData?.friends ?? []} />
+                    <Card title="Intro">
+                        {userData?.bio && (
+                            <Paragraph>{user.bio}</Paragraph>
+                        )}
+                        {(userData?.location.city || userData?.location.country) && (
+                            <List
+                                itemLayout="horizontal"
+                                dataSource={[
+                                    { icon: <HomeOutlined />, text: `Lives in ${city || country}` },
+                                ]}
+                                renderItem={item => (
+                                    <List.Item>
+                                        <List.Item.Meta
+                                            avatar={item.icon}
+                                            title={item.text}
+                                        />
+                                    </List.Item>
+                                )}
+                            />
+                        )}
+
+                    </Card>
+                    <FriendList friends={userData?.friends ?? []} onClick={() => setFriendsModel(true)} />
                 </Col>
 
                 {/* Right Column */}
                 <Col xs={24} md={16}>
                     <div style={{ marginBottom: '1rem' }}>
                         <PostCreate onPost={handleNewPost} />
-                        <Feed userId={userData?._id} key={feedKey} newPost={newPost} />
+                        <div style={{ margin: "10px 0" }}>
+                            {userPost?.posts?.length > 0 ? (
+                                userPost?.posts.map(post => (
+                                    <Post
+                                        key={post._id}
+                                        id={post._id}
+                                        ownerId={post.ownerId}
+                                        title={post.title}
+                                        content={post.content}
+                                        media={post.media}
+                                        reactsCount={post.reactsCount}
+                                        sharesCount={post.shareCount}
+                                        reactions={post.reactions}
+                                        visibility={post.visibility}
+                                        createdAt={post.createdAt}
+                                        updatedAt={post.updatedAt}
+                                        username={post.username ?? userData.username}
+                                        avatarUrl={post.avatarUrl}
+                                        comments={post.comments}
+
+                                    />
+                                ))
+                            ) : (
+                                <p>No posts to display.</p>
+                            )}
+                        </div>
                     </div>
                 </Col>
             </Row>

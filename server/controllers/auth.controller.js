@@ -323,6 +323,9 @@ const getMe = async (req, res, next) => {
             throw new createHttpError.NotFound('User not found');
         }
 
+        const countFriendsNotifications= user.friendRequestsReceived.length;
+
+
         res.status(200).json({
             _id: user._id,
             username: user.username,
@@ -337,8 +340,7 @@ const getMe = async (req, res, next) => {
             friends: user.friends,
             role: user.role,
             accountVerification: user.accountVerification,
-            createdAt: user.createdAt,
-            updatedAt: user.updatedAt
+            friendNotification: countFriendsNotifications
         });
     } catch (error) {
         console.error('getMe error:', error);

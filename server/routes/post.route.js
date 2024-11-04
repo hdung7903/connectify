@@ -11,7 +11,7 @@ postRoute.post('/reply', replyToComment);
 postRoute.post('/share', sharePost);
 postRoute.get('/home', renderPost);
 postRoute.get('/user/:userId', getUser);
-postRoute.get('/:userId', getPostByUserId);
+postRoute.get('/:otherId', getPostByUserId);
 postRoute.get('/owner', getOwnerPost);
 
 module.exports = postRoute;

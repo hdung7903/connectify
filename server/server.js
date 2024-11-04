@@ -35,7 +35,7 @@ app.use(cors({
     },
     credentials: true,
     exposedHeaders: 'X-New-Access-Token',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     optionsSuccessStatus: 204
 }));

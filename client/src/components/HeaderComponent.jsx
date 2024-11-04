@@ -15,8 +15,8 @@ const { Title } = Typography;
 function HeaderComponent() {
     const { isAuthenticated, user, accessToken, logout } = useAuth();
     const [userProfile, setUserProfile] = useState({
-        username: null,
-        avatar: null
+        username: user?.username || null,
+        avatar: user?.avatarUrl || null
     });
     const [notifications, setNotifications] = useState([]);
     const [messages, setMessages] = useState([]);
@@ -35,7 +35,7 @@ function HeaderComponent() {
                     });
                     setUserProfile({
                         username: response.data.username,
-                        avatar: response.data.avatar
+                        avatar: response.data.avatarUr
                     });
                 } catch (error) {
                     console.error('Failed to fetch user profile:', error);

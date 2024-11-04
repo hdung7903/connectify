@@ -52,7 +52,7 @@ export default function Home() {
                     <Menu.Item key="2" icon={<TeamOutlined />} onClick={() => navigate("/friends")}>
                         <Space style={{ display: 'flex', justifyContent: 'space-between', alignContent: "flex-end" }}>
                             <Text level={4} style={{ margin: '0.5rem 0' }}>Friends</Text>
-                            <Badge count={11} overflowCount={10} color="#faad14" />
+                            <Badge count={user.friendNotification} overflowCount={10} color="#faad14" />
                         </Space>
                     </Menu.Item>
                     <Menu.Item key="3" icon={<TeamOutlined />}>Groups</Menu.Item>

@@ -3,11 +3,11 @@ require('dotenv').config();  // Make sure your .env is loaded
 
 // Create a nodemailer transporter using SMTP
 const transporter = nodemailer.createTransport({
-  host: "live.smtp.mailtrap.io",
+  host: 'smtp.ethereal.email',
   port: 587,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
+      user: 'magdalena74@ethereal.email',
+      pass: 'gKHF7gkDczF2hXvx5A'
   }
 });
 

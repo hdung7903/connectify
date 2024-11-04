@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Input, List, Button, Card, Typography, Row, Col, Space, Avatar, message } from 'antd';
+import { Input, List, Button, Card, Typography, Row, Col, Space, Avatar, message, Badge } from 'antd';
 import { UserOutlined, UserAddOutlined, UsergroupAddOutlined, SearchOutlined } from '@ant-design/icons';
 import './AddFriend.css';
 import { Link } from 'react-router-dom';
@@ -75,9 +75,29 @@ const AddFriend = () => {
     };
 
     const fetchFriendsList = async () => {
-        const friendsList = user.friends;
-        setFriends(friendsList);
+        try {
+            const response = await api.get('/friends/list', {
+                params: {
+                    page: pagination.currentPage,
+                    limit: 10,
+                    search: searchQuery
+                },
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem('access_token')}`
+                }
+            });
+            setFriends(response.data.data);
+            setPagination(response.data.pagination);
+        } catch (error) {
+            console.error('Error fetching friends list:', error);
+            message.error('Failed to fetch friends list');
+            setFriends([]);
+        }
     };
+
+    useEffect(() => {
+        fetchFriendsList();
+    }, [user]);
 
     useEffect(() => {
         switch (activeTab) {
@@ -104,7 +124,11 @@ const AddFriend = () => {
 
     const handleAcceptRequest = async (requesterId) => {
         try {
-            await api.post('/friends/accept-request', { requesterId });
+            await api.post('/friends/accept-request', { requesterId }, {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem('access_token')}`
+                }
+            });
             message.success('Friend request accepted');
             fetchRequests();
             fetchFriendsList();
@@ -116,7 +140,11 @@ const AddFriend = () => {
 
     const handleRejectRequest = async (requesterId) => {
         try {
-            await api.post('/friends/reject-request', { requesterId });
+            await api.post('/friends/reject-request', { requesterId }, {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem('access_token')}`
+                }
+            });
             message.success('Friend request rejected');
             fetchRequests();
         } catch (error) {
@@ -127,7 +155,11 @@ const AddFriend = () => {
 
     const handleSendRequest = async (recipientId) => {
         try {
-            await api.post('/friends/send-request', { recipientId });
+            await api.post('/friends/send-request', { recipientId }, {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem('access_token')}`
+                }
+            });
             message.success('Friend request sent');
             fetchSuggestions();
             fetchSentRequests();
@@ -139,7 +171,11 @@ const AddFriend = () => {
 
     const handleCancelRequest = async (recipientId) => {
         try {
-            await api.post('/friends/cancel-request', { recipientId });
+            await api.post('/friends/cancel-request', { recipientId }, {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem('access_token')}`
+                }
+            });
             message.success('Friend request cancelled');
             fetchSentRequests();
             fetchSuggestions();
@@ -151,7 +187,11 @@ const AddFriend = () => {
 
     const handleUnfriend = async (friendId) => {
         try {
-            await api.post('/friends/unfriend', { friendId });
+            await api.post('/friends/unfriend', { friendId }, {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem('access_token')}`
+                }
+            });
             message.success('Unfriended successfully');
             fetchFriendsList();
             fetchSuggestions();
@@ -251,8 +291,19 @@ const AddFriend = () => {
                     <List
                         itemLayout="horizontal"
                         dataSource={[
-                            { icon: <UserAddOutlined />, text: 'Friend Requests', key: '1' },
-                            { icon: <UsergroupAddOutlined />, text: 'Suggestions', key: '2' },
+                            {
+                                icon: <UserAddOutlined />, text: (
+                                    <Space>
+                                        <Text>Friend Requests</Text>
+                                        <Badge count={friendRequests.length}></Badge>
+                                    </Space>
+                                ), key: '1'
+                            },
+                            { icon: <UsergroupAddOutlined />, text: (
+                                <Space>
+                                        <Text> Suggestions</Text>
+                                </Space>                             
+                            ), key: '2' },
                             { icon: <UserAddOutlined />, text: 'Sent Requests', key: '3' },
                             { icon: <UserOutlined />, text: 'All Friends', key: '4' },
                         ]}

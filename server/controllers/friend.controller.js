@@ -40,22 +40,14 @@ const sendFriendRequest = async (req, res, next) => {
             throw createHttpError(400, "Friend request already pending");
         }
 
-        // // Update both users
-        // await Promise.all([
-        //     User.findByIdAndUpdate(userId, {
-        //         $addToSet: { friendRequestsSent: recipientId }
-        //     }),
-        //     User.findByIdAndUpdate(recipientId, {
-        //         $addToSet: { friendRequestsReceived: userId }
-        //     })
-        // ]);
-
-        User.findByIdAndUpdate(userId, {
-            $addToSet: { friendRequestsSent: recipientId }
-        });
-        User.findByIdAndUpdate(recipientId, {
-            $addToSet: { friendRequestsReceived: userId }
-        });
+        await Promise.all([
+            User.findByIdAndUpdate(userId, {
+                $addToSet: { friendRequestsSent: recipientId }
+            }),
+            User.findByIdAndUpdate(recipientId, {
+                $addToSet: { friendRequestsReceived: userId }
+            })
+        ]);
 
         res.status(200).json({
             success: true,
@@ -86,7 +78,6 @@ const acceptFriendRequest = async (req, res, next) => {
             throw createHttpError(404, "Friend request not found");
         }
 
-        // Update both users atomically
         await Promise.all([
             User.findByIdAndUpdate(userId, {
                 $addToSet: { friends: requesterId },
@@ -97,6 +88,7 @@ const acceptFriendRequest = async (req, res, next) => {
                 $pull: { friendRequestsSent: userId }
             })
         ]);
+
 
         res.status(200).json({
             success: true,
@@ -117,14 +109,21 @@ const rejectFriendRequest = async (req, res, next) => {
             throw createHttpError(400, "Invalid requester ID format");
         }
 
-        await Promise.all([
-            User.findByIdAndUpdate(userId, {
-                $pull: { friendRequestsReceived: requesterId }
-            }),
-            User.findByIdAndUpdate(requesterId, {
-                $pull: { friendRequestsSent: userId }
-            })
-        ]);
+        // await Promise.all([
+        //     User.findByIdAndUpdate(userId, {
+        //         $pull: { friendRequestsReceived: requesterId }
+        //     }),
+        //     User.findByIdAndUpdate(requesterId, {
+        //         $pull: { friendRequestsSent: userId }
+        //     })
+        // ]);
+
+        User.findByIdAndUpdate(userId, {
+            $pull: { friendRequestsReceived: requesterId }
+        });
+        User.findByIdAndUpdate(requesterId, {
+            $pull: { friendRequestsSent: userId }
+        });
 
         res.status(200).json({
             success: true,
@@ -345,6 +344,58 @@ const getSentRequests = async (req, res, next) => {
     }
 };
 
+const getFriendsList = async (req, res, next) => {
+    try {
+        const userId = req.user.userId;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+        const searchQuery = req.query.search || '';
+
+        const user = await User.findById(userId);
+        if (!user) {
+            throw createHttpError(404, "User not found");
+        }
+
+        const searchCondition = searchQuery ? {
+            username: { $regex: searchQuery, $options: 'i' }
+        } : {};
+
+        const friends = await User.find({
+            _id: { $in: user.friends },
+            isDeleted: false,
+            isActive: true,
+            ...searchCondition
+        })
+        .select('username avatarUrl bio location createdAt')
+        .skip(skip)
+        .limit(limit)
+        .sort({ username: 1 })
+        .lean();
+
+        const total = await User.countDocuments({
+            _id: { $in: user.friends },
+            isDeleted: false,
+            isActive: true,
+            ...searchCondition
+        });
+
+        res.status(200).json({
+            success: true,
+            data: friends,
+            pagination: {
+                currentPage: page,
+                totalPages: Math.ceil(total / limit),
+                totalItems: total,
+                hasMore: skip + friends.length < total
+            }
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     sendFriendRequest,
     acceptFriendRequest,
@@ -354,4 +405,5 @@ module.exports = {
     getSuggestionFriends,
     getFriendRequests,
     getSentRequests,
+    getFriendsList,
 };
