@@ -3,6 +3,7 @@ const postRoute = express.Router();
 const { createPost, reactToPost, commentOnPost, replyToComment, sharePost, renderPost, getUser, getPostByUserId, getOwnerPost } = require('../controllers/post.controller');
 const { reactToComment } = require('../controllers/post.controller');
 
+
 postRoute.post('/', createPost);
 postRoute.post('/react', reactToPost);
 postRoute.post('/comment', commentOnPost);

@@ -1,6 +1,57 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Post:
+ *       type: object
+ *       properties:
+ *         ownerId:
+ *           type: string
+ *           description: The ID of the post owner (User).
+ *         title:
+ *           type: string
+ *           description: Title of the post.
+ *         content:
+ *           type: string
+ *           description: Content of the post.
+ *         media:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               type:
+ *                 type: string
+ *                 enum: [image, video, link, audio]
+ *               url:
+ *                 type: string
+ *               thumbnailUrl:
+ *                 type: string
+ *               size:
+ *                 type: integer
+ *         tags:
+ *           type: array
+ *           items:
+ *             type: string
+ *         visibility:
+ *           type: string
+ *           enum: [public, friends, private]
+ *         reactsCount:
+ *           type: integer
+ *           description: Total count of reactions.
+ *         sharesCount:
+ *           type: integer
+ *           description: Total count of shares.
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ */
+
 const postSchema = new Schema({
     ownerId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     title: { type: String },
