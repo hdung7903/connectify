@@ -1,41 +1,71 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Input, Button, Card, Form, message, Typography, Space } from 'antd';
-import { LockOutlined } from '@ant-design/icons';
+import { LockOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import axios from 'axios';
 import MyLogo from '../../components/MyLogo';
 import Spinning from '../../components/Spinning';
 
 const { Title, Text } = Typography;
 
 function ResetPasswordPage() {
-    const { id } = useParams();
+    const { token, email } = useParams();
     const navigate = useNavigate();
-    const [isValidId, setIsValidId] = useState(false);
+    const [isValidToken, setIsValidToken] = useState(false);
     const [spinning, setSpinning] = useState(true);
 
     useEffect(() => {
-        const validateResetToken = async () => {
-
-            const isValid = id && id.length > 0;
-            setIsValidId(isValid);
-            if (!isValid) {
-                message.error('Invalid or expired reset token');
-                navigate('/404');
+        const verifyToken = async () => {
+            try {
+                const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/auth/reset-password/${token}/${email}`);
+                if (response.status === 200) {
+                    setIsValidToken(true);
+                }
+            } catch (error) {
+                message.error(error.response?.data?.message || 'Invalid or expired token. Please try again.');
+            } finally {
+                setSpinning(false);
             }
-            setSpinning(false);
         };
+        verifyToken();
+    }, [token, email]);
 
-        validateResetToken();
-    }, [id, navigate]);
-
-    const onFinish = (values) => {
+    const onFinish = async (values) => {
         setSpinning(true);
-        console.log('Success:', values);
-        setTimeout(() => {
-            message.success('Password reset successfully!');
-            navigate('/login');
+        try {
+            const { password } = values;
+            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/reset-password`, {
+                token,
+                email,
+                password
+            });
+            if (response.status === 200) {
+                message.success('Password reset successfully! Redirecting to login...');
+                setTimeout(() => navigate('/login'), 2000);
+            } else {
+                message.error(response.data.message || 'Failed to reset password');
+            }
+        } catch (error) {
+            message.error(error.response?.data?.message || 'Failed to reset password. Please try again.');
+        } finally {
             setSpinning(false);
-        }, 1000);
+        }
+    };
+
+    const resendResetPasswordForm = async () => {
+        setSpinning(true);
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/resend-reset-password`, { email });
+            if (response.status === 200) {
+                message.success('Reset password link sent to your email!');
+            } else {
+                message.error(response.data.message || 'Failed to resend reset password');
+            }
+        } catch (error) {
+            message.error(error.response?.data?.message || 'Failed to resend reset password. Please try again.');
+        } finally {
+            setSpinning(false);
+        }
     };
 
     const onFinishFailed = (errorInfo) => {
@@ -43,13 +73,10 @@ function ResetPasswordPage() {
         message.error('Failed to reset password. Please try again.');
     };
 
-    if (!isValidId) {
-        return null;
-    }
-
     return (
         <>
             <Spinning spinning={spinning} />
+            {isValidToken ? (
             <Card style={{
                 width: '100%',
                 maxWidth: '500px',
@@ -109,6 +136,18 @@ function ResetPasswordPage() {
                     </Form>
                 </Space>
             </Card>
+            ):(
+                <Card
+                title="Verification Failed"
+                style={{ textAlign: 'center' }}
+            >
+                <CloseCircleOutlined style={{ fontSize: '48px', color: '#ff4d4f' }} />
+                <p>Your token or email is invalid. You can resend the verification email and try again.</p>
+                <Button type="primary" onClick={resendResetPasswordForm}>
+                    Resend Reset Password Form
+                </Button>
+            </Card>
+            )}
         </>
     );
 }

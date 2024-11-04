@@ -2,30 +2,55 @@ import { Input, Button, Card, Form, Checkbox, message, Typography, Space } from 
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from "react-router-dom";
 import MyLogo from '../../components/MyLogo';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Spinning from '../../components/Spinning';
+import { useAuth } from '../../contexts/AuthContext';
 
 const { Title, Text } = Typography;
 
 function LoginPage() {
   const navigate = useNavigate();
   const [spinning, setSpinning] = useState(false);
+  const { login, isAuthenticated } = useAuth();
+  const [form] = Form.useForm();
 
-  const onFinish = (values) => {
+  useEffect(() => {
+    if (isAuthenticated) {
+      const from = location.state?.from?.pathname || '/home';
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, navigate, location]);
+
+  const onFinish = async (values) => {
     setSpinning(true);
-    setTimeout(() => {
-      if (values.username === 'admin' && values.password === '123456') {
-        message.success('Logged in successfully');
-        localStorage.setItem("auth", "true");
-        const username = values.username;
-        localStorage.setItem("username", username);
-        navigate('/home');
+    try {
+      const result = await login({
+        username: values.username.trim(),
+        password: values.password,
+        remember: values.remember
+      });
+
+      if (result.success) {
+        message.success("Login successful. Welcome back!");
+        setTimeout(() => {
+          navigate('/home', { replace: true });
+        }, 100);
       } else {
-        message.error('Invalid username or password');
-        setSpinning(false); // Stop spinning if login fails
+        message.error(`Login failed! ${result.message}`);
+        form.setFields([
+          {
+            name: 'password',
+            value: ''
+          }
+        ]);
       }
-    }, 1000);
+    } catch (error) {
+      message.error(`Login failed! ${error.message}`);
+    } finally {
+      setSpinning(false);
+    }
   };
+
 
   const onFinishFailed = () => {
     message.error('Please complete the form!');

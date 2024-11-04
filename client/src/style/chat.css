@@ -1,10 +1,13 @@
 .chat-sider {
     background: #f0f2f5;
-    overflow-y: auto;
-    height: 100vh;
+    height: 93.3vh;
     border-right: 1px solid #d3d3d3;
     padding: 16px;
     width: 25%;
+}
+
+.chat-layout {
+    height: 93.3vh;
 }
 
 .chat-header {
@@ -82,20 +85,30 @@
     display: flex;
     align-items: center;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    height: 70px;
+    height: 60px;
     border-bottom: 1px solid #d3d3d3;
+}
+
+.chat-sender-name {
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 8px;
+    margin-bottom: 4px;
+    /* Thêm khoảng cách nhỏ bên dưới tên người gửi */
 }
 
 .chat-header-info {
     margin-left: 12px;
     flex: 1;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    flex-direction: column;
 }
 
 .chat-header-name-status {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    justify-content: flex-start;
     gap: 8px;
 }
 
@@ -120,6 +133,7 @@
 .chat-header-actions {
     display: flex;
     margin-left: auto;
+    gap: 8px;
 }
 
 .chat-header-button {
@@ -134,13 +148,14 @@
 
 /* Nội dung hội thoại */
 .chat-content {
-    padding: 16px;
+    padding: 4px;
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 160px);
+    height: calc(100vh - 80px);
     overflow-y: auto;
     background: #ffffff;
     border-right: 1px solid #d3d3d3;
+    flex: 1;
 }
 
 .chat-messages {
@@ -149,6 +164,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    max-height: 100%;
 }
 
 .chat-message {
@@ -157,12 +173,17 @@
 }
 
 .chat-message.left {
-    justify-content: flex-start;
+    flex-direction: row;
+    margin-left: 10px;
+    /* Đảm bảo tất cả tin nhắn của cùng một người có khoảng cách như nhau */
 }
 
 .chat-message.right {
-    justify-content: flex-end;
+    flex-direction: row-reverse;
+    margin-right: 10px;
+    /* Đảm bảo tất cả tin nhắn của bạn (người gửi 'me') có khoảng cách như nhau */
 }
+
 
 .chat-avatar {
     margin-right: 8px;
@@ -175,6 +196,8 @@
     line-height: 1.4;
     word-break: break-word;
     background-color: #f0f0f0;
+    margin-left: 8px;
+    /* Căn chỉnh phần nội dung để phù hợp với phần avatar */
 }
 
 .chat-bubble-right {
@@ -307,9 +330,6 @@
     color: #595959;
     /* Màu icon */
 }
-
-
-
 
 .chat-collapse {
     background-color: #fff;
