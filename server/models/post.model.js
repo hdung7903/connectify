@@ -123,7 +123,7 @@ const postSchema = new Schema({
     }],
     tags: [{ type: String }],
     visibility: { type: String, enum: ['public', 'friends', 'private'], default: 'public' },
-    likesCount: { type: Number, default: 0 },
+    reactsCount: { type: Number, default: 0 },
     sharesCount: { type: Number, default: 0 },
     reactions: [{
         userId: { type: Schema.Types.ObjectId, ref: 'User' },

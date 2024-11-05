@@ -86,6 +86,7 @@ export default function PostCreate({ onPost }) {
                 media: media,
                 visibility: values.visibility,
                 tags: [],
+                sharedPostId: null,
             };
 
             const response = await api.post("/posts/", postData, {

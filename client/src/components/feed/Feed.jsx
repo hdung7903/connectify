@@ -81,6 +81,7 @@ export default function Feed() {
                         username={post.username}
                         avatarUrl={post.avatarUrl}
                         comments={post.comments}
+                        sharedPostId={post.sharedPostId}
                         refreshPosts={refreshPosts}
                         
                     />
