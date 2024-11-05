@@ -340,3 +340,4 @@ export default function Post(props) {
         </Card>
     );
 }
+

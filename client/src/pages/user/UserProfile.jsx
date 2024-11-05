@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Avatar, Button, Row, Col, Typography, Image, Input, List, Space, message, Upload, Popover, Tabs, Modal } from 'antd';
+import { Card, Avatar, Button, Row, Col, Typography, Image, Input, List, Space, message, Popover, Modal } from 'antd';
 import { UserOutlined, EditOutlined, SettingOutlined, PictureOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../services/axios';
@@ -22,8 +22,6 @@ const UserProfile = () => {
     const [avatar, setAvatar] = useState([{ url: "https://placehold.co/160x160" }]);
     const [cover, setCover] = useState([{ url: "https://placehold.co/1100x300" }]);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [feedKey, setFeedKey] = useState(0);
-    const [newPost, setNewPost] = useState(null);
     const [friendsModel, setFriendsModel] = useState(false);
 
     const [userPost, setUserPost] = useState(null);
@@ -76,12 +74,6 @@ const UserProfile = () => {
             console.log('cleanup');
         }
     }, [id, user._id, navigate]);
-
-
-    const handleNewPost = (post) => {
-        setNewPost(post);
-        setFeedKey(feedKey + 1);
-    };
 
     const handleAvatarClick = () => {
         setIsModalOpen(true);
@@ -172,7 +164,6 @@ const UserProfile = () => {
                 {/* Right Column */}
                 <Col xs={24} md={16}>
                     <div style={{ marginBottom: '1rem' }}>
-                        <PostCreate onPost={handleNewPost} />
                         <div style={{ margin: "10px 0" }}>
                             {userPost?.posts?.length > 0 ? (
                                 userPost?.posts.map(post => (
@@ -190,9 +181,8 @@ const UserProfile = () => {
                                         createdAt={post.createdAt}
                                         updatedAt={post.updatedAt}
                                         username={post.username ?? userData.username}
-                                        avatarUrl={post.avatarUrl}
+                                        avatarUrl={post.avatarUrl??userData.avatarUrl}
                                         comments={post.comments}
-
                                     />
                                 ))
                             ) : (

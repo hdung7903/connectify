@@ -1,15 +1,14 @@
 const nodemailer = require('nodemailer');
-require('dotenv').config();  // Make sure your .env is loaded
+require('dotenv').config(); 
 
 // Create a nodemailer transporter using SMTP
 const transporter = nodemailer.createTransport({
   host: 'smtp.ethereal.email',
   port: 587,
   auth: {
-      user: 'magdalena74@ethereal.email',
-      pass: 'gKHF7gkDczF2hXvx5A'
+      user: 'triston.wintheiser@ethereal.email',
+      pass: 'yfEfnqqj6eFrvkq9Kx'
   }
 });
 
-// Export the transporter object
 module.exports = transporter;

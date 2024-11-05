@@ -4,14 +4,15 @@ const User = require('../models/user.model');
 // Tạo post mới
 const createPost = async (req, res) => {
     try {
-        const { title, content, media, visibility, tags } = req.body;
+        const { title, content, media, visibility, tags, sharePostId } = req.body;
         const newPost = new Post({
             ownerId: req.user.userId,
             title,
             content,
             media,
             visibility,
-            tags
+            tags,
+            sharePostId,
         });
         await newPost.save();
         res.status(201).json(newPost);

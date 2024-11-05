@@ -9,6 +9,7 @@ import FriendList from '../../components/profile/FriendList';
 import api from '../../services/axios';
 import Post from '../../components/post/Post';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import EditProfileModal from '../../components/modal/EditProfileModel';
 
 const { Title } = Typography;
 
@@ -20,6 +21,8 @@ const OwnerProfile = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [posts, setPosts] = useState([]);
     const [uploadLoading, setUploadLoading] = useState(false);
+    const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+    const [userData, setUserData] = useState(user);
 
     const fetchPosts = async () => {
         try {
@@ -104,7 +107,7 @@ const OwnerProfile = () => {
                     setAvatar(newFileList);
                     return;
                 } else {
-                    setCover(newFileList); 
+                    setCover(newFileList);
                 }
                 setFileList(newFileList);
                 return;
@@ -132,6 +135,10 @@ const OwnerProfile = () => {
             </Button>
         </ImgCrop>
     );
+
+    const handleProfileUpdate = (updatedUser) => {
+        setUserData(updatedUser);
+      };
 
     return (
         <div style={{ maxWidth: 1100, margin: '20px auto' }}>
@@ -163,7 +170,7 @@ const OwnerProfile = () => {
                         <Title level={2}>{user?.username}</Title>
                         <Row gutter={16} style={{ marginTop: 40 }}>
                             <Col>
-                                <Button type="primary" icon={<EditOutlined />}>
+                                <Button type="primary" icon={<EditOutlined />} onClick={() => setIsEditModalVisible(true)}>
                                     Edit Profile
                                 </Button>
                             </Col>
@@ -184,7 +191,23 @@ const OwnerProfile = () => {
                     <PostCreate />
                     <div style={{ margin: "10px 0" }}>
                         {posts.length > 0 ? posts.map(post => (
-                            <Post key={post._id} {...post} />
+                            <Post
+                                key={post._id}
+                                id={post._id}
+                                ownerId={post.ownerId}
+                                title={post.title}
+                                content={post.content}
+                                media={post.media}
+                                reactsCount={post.reactsCount}
+                                sharesCount={post.shareCount}
+                                reactions={post.reactions}
+                                visibility={post.visibility}
+                                createdAt={post.createdAt}
+                                updatedAt={post.updatedAt}
+                                username={post.username ?? user.username}
+                                avatarUrl={post.avatarUrl ?? user.avatarUrl}
+                                comments={post.comments}
+                            />
                         )) : (
                             <p>No posts to display.</p>
                         )}
@@ -195,6 +218,12 @@ const OwnerProfile = () => {
             <Modal open={isModalOpen} onCancel={() => setIsModalOpen(false)} footer={null} width={800}>
                 <img src={avatar[0].url} style={{ width: "100%", height: "100%" }} alt="User Avatar" />
             </Modal>
+            <EditProfileModal
+                visible={isEditModalVisible}
+                onCancel={() => setIsEditModalVisible(false)}
+                onSuccess={handleProfileUpdate}
+                initialValues={userData}
+            />
         </div>
     );
 };
