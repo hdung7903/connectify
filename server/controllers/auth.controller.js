@@ -95,6 +95,8 @@ const login = async (req, res, next) => {
 
         await tokenDocument.save();
 
+        console.log('accessToken:', accessToken);
+
         res.status(200).json({ accessToken });
     } catch (err) {
         next(err);
