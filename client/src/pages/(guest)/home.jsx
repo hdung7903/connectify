@@ -3,11 +3,23 @@ import { UserOutlined, GlobalOutlined, TeamOutlined, MessageOutlined, SafetyOutl
 import { FeatureCard } from '../../components/FeatureCard';
 import Spinning from '../../components/Spinning';
 import useLoading from '../../hooks/useLoading';
+import { useEffect } from 'react';
+import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const { Title, Paragraph } = Typography;
 
 function Home() {
     const { spinning, handleNavigation } = useLoading();
+    const {user, isAuthenticated} = useAuth();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            const from = location.state?.from?.pathname || '/home';
+            navigate(from, { replace: true });
+          }
+    }, [user]);
 
     return (
         <>

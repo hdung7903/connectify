@@ -43,7 +43,7 @@ export default function Home() {
                 scrollbarGutter: 'stable',
             }}>
                 <Menu mode="inline" defaultSelectedKeys={['1']} style={{ marginTop: "10px" }}>
-                    <Menu.Item key="0" icon={<Avatar size={30} icon={<UserOutlined />} />} onClick={() => navigate("/profile")}>
+                    <Menu.Item key="0" icon={<Avatar size={30} src={user.avatarUrl} />} onClick={() => navigate("/profile")}>
                         <Text level={4} style={{ margin: '0.5rem 0' }}>{user.username}</Text>
                     </Menu.Item>
                     <Menu.Item key="1" icon={<HomeOutlined />} onClick={() => navigate("/home")}>

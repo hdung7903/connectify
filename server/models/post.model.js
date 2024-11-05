@@ -44,6 +44,65 @@ const { Schema } = mongoose;
  *         sharesCount:
  *           type: integer
  *           description: Total count of shares.
+ *         sharedPostId:
+ *           type: string
+ *           description: The ID of the shared post.
+ *         reactions:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *                 description: The ID of the user who reacted.
+ *               type:
+ *                 type: string
+ *                 enum: [like, love, haha, wow, sad, angry]
+ *               createdAt:
+ *                 type: string
+ *                 format: date-time
+ *         comments:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *                 description: The ID of the user who commented.
+ *               content:
+ *                 type: string
+ *                 description: The content of the comment.
+ *               reactions:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     userId:
+ *                       type: string
+ *                       description: The ID of the user who reacted.
+ *                     type:
+ *                       type: string
+ *                       enum: [like, love, haha, wow, sad, angry]
+ *               replies:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     userId:
+ *                       type: string
+ *                       description: The ID of the user who replied.
+ *                     content:
+ *                       type: string
+ *                       description: The content of the reply.
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *               createdAt:
+ *                 type: string
+ *                 format: date-time
+ *               updatedAt:
+ *                 type: string
+ *                 format: date-time
  *         createdAt:
  *           type: string
  *           format: date-time
@@ -87,6 +146,7 @@ const postSchema = new Schema({
         createdAt: { type: Date, default: Date.now },
         updatedAt: { type: Date, default: Date.now }
     }],
+    sharedPostId: { type: Schema.Types.ObjectId, ref: 'Post' },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
 }, { timestamps: true });

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Card, Input, Upload, Button, message } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import { Card, Input, Upload, Button, message, Dropdown, Space } from 'antd';
+import { DownOutlined, GlobalOutlined, LockOutlined, UploadOutlined, UserOutlined } from '@ant-design/icons';
 import Avatar from '../avatar/Avatar';
 import './postCreate.css';
 import useForm from '../../hooks/useForm';
@@ -9,22 +9,46 @@ import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { storage } from '../../firebase/config';
 import { useAuth } from '../../contexts/AuthContext';
 
+const VISIBILITY_OPTIONS = {
+    PUBLIC: 'public',
+    FRIENDS: 'friends',
+    PRIVATE: 'private'
+};
+
+const items = [
+    {
+        label: 'Public',
+        key: VISIBILITY_OPTIONS.PUBLIC,
+        icon: <GlobalOutlined />,
+    },
+    {
+        label: 'Friends',
+        key: VISIBILITY_OPTIONS.FRIENDS,
+        icon: <UserOutlined />,
+    },
+    {
+        label: 'Private',
+        key: VISIBILITY_OPTIONS.PRIVATE,
+        icon: <LockOutlined />,
+    },
+];
+
 export default function PostCreate({ onPost }) {
-    const [values, handleChange, handleSubmit, setValues] = useForm(submitPost, { text: '', img: [] });
+    const [values, handleChange, handleSubmit, setValues] = useForm(submitPost, { text: '', img: [], visibility: VISIBILITY_OPTIONS.FRIENDS });
     const [fileList, setFileList] = useState([]);
     const [uploading, setUploading] = useState(false);
-    const {user}=useAuth();
+    const { user } = useAuth();
 
-    const avatar=(user.avatarUrl||user.avatarUrl!=="")?user.avatarUrl:"http://placehold.it/160x160";
+    const avatar = (user.avatarUrl || user.avatarUrl !== "") ? user.avatarUrl : "http://placehold.it/160x160";
 
     const uploadImageToFirebase = async (files) => {
         if (!files || files.length === 0) return [];
-        
+
         try {
             const uploadPromises = files.map(async (file) => {
                 const actualFile = file.originFileObj || file;
                 const fileName = `${Date.now()}_${actualFile.name}`;
-                
+
                 try {
                     const storageRef = ref(storage, `posts/${fileName}-${Date.now()}-${actualFile.name}`);
                     const snapshot = await uploadBytes(storageRef, actualFile);
@@ -48,7 +72,7 @@ export default function PostCreate({ onPost }) {
 
         try {
             const imageUrls = await uploadImageToFirebase(values.img);
-            
+
             const media = imageUrls.map((url) => ({
                 type: 'image',
                 url: url,
@@ -60,7 +84,7 @@ export default function PostCreate({ onPost }) {
                 title: "Your Post Title",
                 content: values.text,
                 media: media,
-                visibility: 'friends',
+                visibility: values.visibility,
                 tags: [],
             };
 
@@ -81,7 +105,7 @@ export default function PostCreate({ onPost }) {
         } catch (error) {
             console.error("Error creating post:", error);
             message.error(
-                error.response?.data?.message || 
+                error.response?.data?.message ||
                 'Failed to create post. Please try again.'
             );
         } finally {
@@ -106,20 +130,19 @@ export default function PostCreate({ onPost }) {
             message.error(`${file.name} is not an image file`);
             return Upload.LIST_IGNORE;
         }
-    
+
         const isLt5M = file.size / 1024 / 1024 < 5;
         if (!isLt5M) {
             message.error('Image must be smaller than 5MB!');
             return Upload.LIST_IGNORE;
         }
-    
+
         // Check if the file is already in the fileList
         const fileExists = fileList.some(existingFile => existingFile.name === file.name && existingFile.size === file.size);
         if (fileExists) {
             return Upload.LIST_IGNORE;
         }
-    
-        // Add file to the state without triggering actual upload
+
         setFileList(prevList => [...prevList, {
             uid: file.uid,
             name: file.name,
@@ -129,7 +152,7 @@ export default function PostCreate({ onPost }) {
         }]);
         return false;
     };
-    
+
 
     const handleRemove = (file) => {
         setFileList(prevList => prevList.filter(item => item.uid !== file.uid));
@@ -137,10 +160,25 @@ export default function PostCreate({ onPost }) {
         setValues({ ...values, img: updatedImages });
     };
 
+    const handleVisibilityChange = ({ key }) => {
+        setValues(prev => ({ ...prev, visibility: key }));
+    };
+
+
+    const menuProps = {
+        items,
+        onClick: handleVisibilityChange,
+    };
+
+    const getVisibilityLabel = () => {
+        const option = items.find(item => item.key === values.visibility);
+        return option ? option.label : 'Friends';
+    };
+
     return (
         <Card className="PostCreate" title={
             <div style={{ display: 'flex', alignItems: 'center' }}>
-                <Avatar src={<img src={avatar} alt='avatar'/>} />
+                <Avatar src={<img src={avatar} alt='avatar' />} />
                 <span style={{ marginLeft: '10px' }}>Write a new post</span>
             </div>
         }>
@@ -157,6 +195,14 @@ export default function PostCreate({ onPost }) {
                     disabled={uploading}
                     variant="borderless"
                 />
+                <Dropdown menu={menuProps}>
+                    <Button>
+                        <Space>
+                            {getVisibilityLabel()}
+                            <DownOutlined />
+                        </Space>
+                    </Button>
+                </Dropdown>
                 <Upload
                     name="img"
                     multiple
@@ -172,9 +218,9 @@ export default function PostCreate({ onPost }) {
                         Upload Images
                     </Button>
                 </Upload>
-                <Button 
-                    type="primary" 
-                    htmlType="submit" 
+                <Button
+                    type="primary"
+                    htmlType="submit"
                     style={{ marginTop: '10px' }}
                     loading={uploading}
                     disabled={uploading}

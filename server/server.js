@@ -10,7 +10,7 @@ const authRouter = require('./routes/auth.route');
 const cookieParser = require('cookie-parser');
 const postRoute = require('./routes/post.route');
 const authMiddleware = require('./middleware/auth.middleware');
-const friendRouter = require('./routes/friend.route'); // Thêm router bạn bè
+const friendRouter = require('./routes/friend.route')
 const http = require('http');
 const initializeSocket = require('./config/socket.config');
 const userRouter = require('./routes/user.route');
@@ -86,3 +86,4 @@ app.use(async (err, req, res, next) => {
 app.listen(PORT, () => {
     console.log(`Server started on port ${PORT}`);
 })
+
