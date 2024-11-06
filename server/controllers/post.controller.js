@@ -4,7 +4,7 @@ const User = require('../models/user.model');
 // Tạo post mới
 const createPost = async (req, res) => {
     try {
-        const { title, content, media, visibility, tags, sharePostId } = req.body;
+        const { title, content, media, visibility, tags, sharedPostId } = req.body;
         const newPost = new Post({
             ownerId: req.user.userId,
             title,
@@ -12,7 +12,7 @@ const createPost = async (req, res) => {
             media,
             visibility,
             tags,
-            sharePostId,
+            sharedPostId
         });
         await newPost.save();
         res.status(201).json(newPost);
@@ -158,6 +158,20 @@ const getMyPosts = async (req, res) => {
     }
 };
 
+const getPost = async (req, res) => {
+    try {
+        const { postId } = req.params;
+        const post = await Post.findById(postId);
+        if (post.length === 0|| !post) {
+            return res.status(404).json({ message: 'You have not this post' });
+        }
+        res.status(200).json(post);
+    } catch (error) {
+        console.error("Error fetching user's own posts:", error);
+        res.status(500).json({ message: "An error occurred", error });
+    }
+};
+
 // Lấy bài viết của người dùng khác
 const getUserPosts = async (req, res) => {
     const { userId } = req.params;
@@ -185,8 +199,6 @@ const getUserPosts = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
-
-
 
 const renderPost = async (req, res) => {
     try {
@@ -304,4 +316,5 @@ module.exports = {
     getOwnerPost,
     getPostByUserId,
     getUser,
+    getPost,
 };

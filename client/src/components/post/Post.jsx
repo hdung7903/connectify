@@ -5,6 +5,7 @@ import Reaction from '../interact/Reaction';
 import CommentButton from '../interact/CommentButton';
 import Comments from '../interact/Comments';
 import Slideshow from '../slideshow/Slideshow';
+import SharePost from '../postCreate/sharePost';
 import { ShareAltOutlined, SendOutlined, MoreOutlined, UndoOutlined, UsergroupAddOutlined, LockOutlined, GlobalOutlined } from '@ant-design/icons';
 import './post.css';
 import api from '../../services/axios';
@@ -14,7 +15,7 @@ import { useAuth } from '../../contexts/AuthContext';
 const { Text, Paragraph } = Typography;
 
 export default function Post(props) {
-    const { id, ownerId, title, avatarUrl, content, media, reactsCount, reactions, visibility, createdAt, updatedAt, username, comments, sharesCount, refreshPosts } = props;
+    const { id, ownerId, title, avatarUrl, content, media, reactsCount, reactions, visibility, createdAt, updatedAt, username, comments, sharesCount, refreshPosts, sharedPostId } = props;
     const navigate = useNavigate();
     const { user } = useAuth();
     const userId = user._id;
@@ -28,6 +29,10 @@ export default function Post(props) {
         showModal: false,
         hidden: false,
         selectedReaction: reactions.find(reaction => reaction.userId === userId)?.type || null,
+        showShareModal: false,
+        PostSharedData: null, // Initialize with null
+        ownerPostSharedData: null, // Initialize with null
+        isLoadingSharedData: true, // Track loading state
     });
 
     const [expanded, setExpanded] = useState(true);
@@ -48,6 +53,48 @@ export default function Post(props) {
 
         fetchComments();
     }, [props.comments]);
+
+    // Fetch shared post data if there is a sharedPostId
+    useEffect(() => {
+        const fetchSharedPostData = async () => {
+            if (sharedPostId) {
+                try {
+                    // Fetch the shared post data
+                    const userResponse = await api.get(`/posts/post-by-id/${sharedPostId}`, {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+                        },
+                    });
+                    const PostSharedData = userResponse.data;
+
+                    // Fetch owner data of the shared post
+                    const ownerResponse = await api.get(`/posts/user/${PostSharedData.ownerId}`, {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+                        },
+                    });
+
+                    setState(prevState => ({
+                        ...prevState,
+                        PostSharedData,
+                        ownerPostSharedData: {
+                            avatarUrl: ownerResponse.data.avatarUrl || 'https://placeholder.co/40x40',
+                            username: ownerResponse.data.username || 'Unknown User',
+                        },
+                        isLoadingSharedData: false, // Mark as loaded
+                    }));
+                } catch (error) {
+                    console.error("Error fetching shared post data:", error);
+                    setState(prevState => ({
+                        ...prevState,
+                        isLoadingSharedData: false, // Mark as loaded even on error
+                    }));
+                }
+            }
+        };
+
+        fetchSharedPostData();
+    }, [sharedPostId]);
 
     const handleReaction = async (reactionType) => {
         const newReaction = state.selectedReaction === reactionType ? null : reactionType;
@@ -83,6 +130,20 @@ export default function Post(props) {
         } catch (error) {
             console.error("Failed to react to post:", error);
         }
+    };
+
+    const handleShareClick = () => {
+        setState(prevState => ({
+            ...prevState,
+            showShareModal: true,
+        }));
+    };
+
+    const closeShareModal = () => {
+        setState(prevState => ({
+            ...prevState,
+            showShareModal: false,
+        }));
     };
 
     function toggleComments() {
@@ -232,6 +293,22 @@ export default function Post(props) {
                         </Text>
                     )}
                     {Array.isArray(media) && media.length > 0 && <Slideshow images={media.map(item => item.url)} />}
+                    <div className="post-split"></div>
+                    {title === 'Post share' && state.PostSharedData && !state.isLoadingSharedData && (
+                        <div className="shared-post">
+                            <Paragraph>{state.shareMessage}</Paragraph>
+                            <div className="shared-post-content">
+                                <Row align="middle">
+                                    <Avatar imgId={state.ownerPostSharedData.avatarUrl || 'https://placeholder.co/40x40'} />
+                                    <div style={{ marginLeft: '8px' }}>
+                                        <Text strong>{state.ownerPostSharedData.username}</Text>
+                                    </div>
+                                </Row>
+                                <Paragraph>{state.PostSharedData.content}</Paragraph>
+                                {Array.isArray(state.PostSharedData.media) && state.PostSharedData.media.length > 0 && <Slideshow images={state.PostSharedData.media.map(item => item.url)} />}
+                            </div>
+                        </div>
+                    )}
                 </Col>
             </Row>
             <div className="post-stats">
@@ -244,7 +321,7 @@ export default function Post(props) {
                 <span onClick={focusCommentInput} className="comment-button">
                     <CommentButton>Comment</CommentButton>
                 </span>
-                <span className="share-button">
+                <span className="share-button" onClick={handleShareClick}>
                     <ShareAltOutlined />
                     Share
                 </span>
@@ -277,6 +354,12 @@ export default function Post(props) {
                     }
                 />
             </div>
+            <SharePost
+                showShareModal={state.showShareModal}
+                closeShareModal={closeShareModal}
+                postId={id}
+                refreshPosts={refreshPosts}
+            />
         </>
     );
 
