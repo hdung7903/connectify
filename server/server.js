@@ -9,11 +9,14 @@ const path = require('path');
 const authRouter = require('./routes/auth.route');
 const cookieParser = require('cookie-parser');
 const postRoute = require('./routes/post.route');
+const chatRouter = require('./routes/chat.route');
+const messageRouter = require('./routes/message.route');
 const authMiddleware = require('./middleware/auth.middleware');
 const friendRouter = require('./routes/friend.route')
 const http = require('http');
 const initializeSocket = require('./config/socket.config');
 const userRouter = require('./routes/user.route');
+const utilRouter = require('./routes/util.route');
 require('dotenv').config();
 
 const PORT = process.env.PORT || 9999
@@ -67,6 +70,12 @@ app.use('/posts', authMiddleware, postRoute);
 app.use('/friends', authMiddleware, friendRouter);
 
 app.use("/users", authMiddleware, userRouter);
+
+app.use("/api/user", userRouter);
+app.use("/api/chat", chatRouter);
+app.use("/api/message", messageRouter);
+
+app.use(utilRouter);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 

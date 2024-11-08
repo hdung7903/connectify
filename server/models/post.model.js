@@ -114,9 +114,10 @@ const { Schema } = mongoose;
 const postSchema = new Schema({
     ownerId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     title: { type: String },
-    content: { type: String, required: true },
+    content: { type: String },
     media: [{
         type: { type: String, enum: ['image', 'video', 'link', 'audio'], default: 'image' },
+        content: { type: String },
         url: { type: String },
         thumbnailUrl: { type: String },
         size: { type: Number }
@@ -141,6 +142,11 @@ const postSchema = new Schema({
         replies: [{
             userId: { type: Schema.Types.ObjectId, ref: 'User' },
             content: { type: String, required: true },
+            reactions: [{
+                userId: { type: Schema.Types.ObjectId, ref: 'User' },
+                type: { type: String, enum: ['like', 'love', 'haha', 'wow', 'sad', 'angry'] },
+                createdAt: { type: Date, default: Date.now }
+            }],
             createdAt: { type: Date, default: Date.now }
         }],
         createdAt: { type: Date, default: Date.now },

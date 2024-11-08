@@ -26,3 +26,27 @@
 .slideshow .prevImg:hover {
     cursor: pointer;
 }
+
+.image-modal .ant-modal-content {
+    background-color: transparent;
+    box-shadow: none;
+    height: 100vh;
+}
+
+.image-modal .ant-modal-body {
+    height: 100%;
+    padding: 0;
+}
+
+.nav-button:hover {
+    background-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.close-button:hover {
+    opacity: 0.8;
+}
+
+.ant-modal-close{
+    height: auto;
+    width: auto;
+}

@@ -185,7 +185,7 @@ const getPost = async (req, res) => {
     try {
         const { postId } = req.params;
         const post = await Post.findById(postId);
-        if (post.length === 0|| !post) {
+        if (post.length === 0 || !post) {
             return res.status(404).json({ message: 'You have not this post' });
         }
         res.status(200).json(post);
@@ -212,7 +212,7 @@ const getUserPosts = async (req, res) => {
         }
 
         const posts = await Post.find({ ownerId: userId, visibility: 'public' }).sort({ createdAt: -1 });
-        
+
         if (posts.length === 0) {
             return res.status(200).json({ message: 'This user has no public posts' });
         }

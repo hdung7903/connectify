@@ -4,7 +4,7 @@ import { Button } from 'antd';
 
 export default function CommentButton(props) {
     return (
-        <Button style={{ border: "none", background: "none" }}>
+        <Button type="text">
             <CommentOutlined style={{ marginRight: 4 }} />
             {props.children}
         </Button>

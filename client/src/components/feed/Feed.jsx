@@ -69,6 +69,7 @@ export default function Feed() {
                         key={post._id}
                         id={post._id}
                         ownerId={post.ownerId}
+                        ownerName={post.userName}
                         title={post.title}
                         content={post.content}
                         media={post.media}
