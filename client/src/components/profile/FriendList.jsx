@@ -49,7 +49,7 @@ function FriendList(props) {
                                 <Avatar 
                                     shape="square" 
                                     size={80} 
-                                    src={friend?.avatarUrl || "http://placehold.co/160x160"} 
+                                    imgId={friend?.avatar} 
                                     icon={<UserOutlined />} 
                                     onClick={() => handleAvatarClick(friend)}
                                     style={{ cursor: 'pointer' }}

@@ -34,6 +34,7 @@ const createUser = async (req, res, next) => {
             gender,
             dob: new Date(dob),
             avatarUrl: "",
+            coverUrl: "",
             bio: null,
             location: {
                 city: "",

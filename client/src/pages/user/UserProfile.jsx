@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Avatar, Button, Row, Col, Typography, Image, Input, List, Space, message, Popover, Modal } from 'antd';
-import { UserOutlined, EditOutlined, SettingOutlined, PictureOutlined } from '@ant-design/icons';
+import { UserOutlined, EditOutlined, SettingOutlined, PictureOutlined, HomeOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../services/axios';
 import { useAuth } from '../../contexts/AuthContext';
 import FriendList from '../../components/profile/FriendList';
-import PostCreate from '../../components/postCreate/postCreate';
 import Post from '../../components/post/Post';
 
 const { Title, Text, Paragraph } = Typography;
@@ -33,9 +32,8 @@ const UserProfile = () => {
                     Authorization: `Bearer ${localStorage.getItem('access_token')}`
                 }
             });
-            console.log(response.data ?? "No user found");
+            console.log(response.data.user ?? "No user found");
             setUserData(response.data.user);
-            console.log(userData);
             if (response.data.user.avatarUrl || response.data.user.avatarUrl !== "") {
                 setAvatar([{ url: response.data.user.avatarUrl }]);
             }
@@ -55,7 +53,8 @@ const UserProfile = () => {
                     Authorization: `Bearer ${localStorage.getItem('access_token')}`
                 }
             });
-            console.log(response.data ?? "No user post found");
+            console.log(response.data);
+            
             setUserPost(response.data);
         } catch (error) {
             console.error('Error fetching user post:', error);
@@ -88,9 +87,8 @@ const UserProfile = () => {
                 </Space>
             </List.Item>
         </List>
-    )
-
-
+    );
+    
 
     return (
         <div style={{ maxWidth: 1100, margin: '20px auto' }}>
@@ -100,7 +98,7 @@ const UserProfile = () => {
                     <div style={{ position: 'relative' }}>
                         <Image
                             src={`${cover[0].url}`}
-                            style={{ objectFit: 'cover', height: 300, width: '100%' }}
+                            style={{ objectFit: 'cover', height: 300, width: '1100px' }}
                             preview={false}
                             alt="Cover Photo"
                         />
@@ -119,11 +117,13 @@ const UserProfile = () => {
                         <Title level={2}>{userData?.username}</Title>
                         <Row gutter={16} style={{ marginTop: 40 }}>
                             <Col>
-                                {
-                                    userPost?.relationship === "friend" ?
-                                        <Button icon={<UserOutlined />}>Friend</Button> :
-                                        <Button type="primary" icon={<EditOutlined />}>Add Friend</Button>
-                                }
+                                {userData?.friends?.some(friend => friend._id === user._id) ? (
+                                    <Button icon={<UserOutlined />}>Friend</Button>
+                                ) : (
+                                    <Button type="primary" icon={<EditOutlined />}>
+                                        Add Friend
+                                    </Button>
+                                )}
                             </Col>
                             <Col>
                                 <Button icon={<SettingOutlined />}>Account Settings</Button>
@@ -144,7 +144,7 @@ const UserProfile = () => {
                             <List
                                 itemLayout="horizontal"
                                 dataSource={[
-                                    { icon: <HomeOutlined />, text: `Lives in ${city || country}` },
+                                    { icon: <HomeOutlined />, text: `Lives in ${userData?.location.city || userData?.location.country}` },
                                 ]}
                                 renderItem={item => (
                                     <List.Item>
@@ -161,16 +161,15 @@ const UserProfile = () => {
                     <FriendList friends={userData?.friends ?? []} onClick={() => setFriendsModel(true)} />
                 </Col>
 
-                {/* Right Column */}
                 <Col xs={24} md={16}>
                     <div style={{ marginBottom: '1rem' }}>
                         <div style={{ margin: "10px 0" }}>
-                            {userPost?.posts?.length > 0 ? (
-                                userPost?.posts.map(post => (
+                            {userPost?.length > 0 ? (
+                                userPost?.map(post => (
                                     <Post
                                         key={post._id}
                                         id={post._id}
-                                        ownerId={post.ownerId}
+                                        ownerId={post.ownerId??userData._id}
                                         title={post.title}
                                         content={post.content}
                                         media={post.media}
@@ -181,7 +180,7 @@ const UserProfile = () => {
                                         createdAt={post.createdAt}
                                         updatedAt={post.updatedAt}
                                         username={post.username ?? userData.username}
-                                        avatarUrl={post.avatarUrl??userData.avatarUrl}
+                                        avatarUrl={post.avatarUrl ?? userData.avatarUrl}
                                         comments={post.comments}
                                     />
                                 ))
@@ -198,7 +197,7 @@ const UserProfile = () => {
                 footer={null}
                 width={800}
             >
-                <img src={(!userData?.avatarUrl || userData?.avatarUrl === "") ? "http://placehold.co/160x160" : user.avatarUrl} style={{ width: "100%", height: "100%", marginTop: 30 }} />
+                <img src={(!userData?.avatarUrl || userData?.avatarUrl === "") ? "http://placehold.co/160x160" : userData.avatarUrl} style={{ width: "100%", height: "100%", marginTop: 30 }} />
             </Modal>
         </div>
     );
