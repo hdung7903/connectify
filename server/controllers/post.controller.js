@@ -106,21 +106,44 @@ const commentOnPost = async (req, res) => {
 // Phản hồi bình luận
 const replyToComment = async (req, res) => {
     try {
-        const { postId, commentId, content } = req.body;
-        const post = await Post.findById(postId);
+        const { parentCommentId, content, postId } = req.body;
+        // const {  } = req.query;
+        const { userId } = req.user;
 
+        const post = await Post.findById(postId);
         if (!post) {
             return res.status(404).json({ message: 'Post not found' });
         }
 
-        const comment = post.comments.id(commentId);
-        if (!comment) {
-            return res.status(404).json({ message: 'Comment not found' });
+        let parentComment;
+        if (parentCommentId) {
+            parentComment = post.comments.id(parentCommentId);
+            if (!parentComment) {
+                return res.status(404).json({ message: 'Parent comment not found' });
+            }
+        }
+        const newReply = {
+            userId,
+            content,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        };
+
+        if (parentComment) {
+            parentComment.replies.push(newReply);
+        } else {
+            post.comments.push({
+                userId,
+                content,
+                reactions: [],
+                replies: [newReply],
+                createdAt: new Date(),
+                updatedAt: new Date()
+            });
         }
 
-        comment.replies.push({ userId: req.user.userId, content });
         await post.save();
-        res.status(201).json(post);
+        res.status(201).json(newReply);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

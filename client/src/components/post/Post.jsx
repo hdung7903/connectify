@@ -334,7 +334,7 @@ export default function Post(props) {
                     </div>
                 )}
                 {state.comments.length > 0 ? (
-                    <Comments comments={state.comments.slice(0, 2)} />
+                    <Comments comments={state.comments.slice(0, 2)} postId={id} />
                 ) : null}
             </div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
