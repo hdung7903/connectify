@@ -1,0 +1,73 @@
+/* SingleChat Styles */
+.singleChat-container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f0f2f5;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.singleChat-header {
+  padding: 10px;
+  background-color: #0078ff;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.singleChat-header h4 {
+  color: #ffffff;
+  margin: 0;
+}
+
+.singleChat-messages {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  background-color: white;
+}
+
+.message {
+  display: inline-block;
+  max-width: 80%;
+  padding: 8px 12px;
+  border-radius: 18px;
+  font-size: 15px;
+  margin: 5px 0;
+}
+
+.message.sent {
+  background-color: #0078ff;
+  color: white;
+  align-self: flex-end;
+}
+
+.message.received {
+  background-color: #e5e5ea;
+  color: #333;
+  align-self: flex-start;
+}
+
+.singleChat-input {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: #f0f2f5;
+  border-top: 1px solid #e0e0e0;
+}
+
+.input-box {
+  width: 100%;
+  padding: 10px;
+  border-radius: 18px;
+  border: none;
+  background-color: #e5e5ea;
+  outline: none;
+}
+
+.input-box::placeholder {
+  color: #a0a0a0;
+}

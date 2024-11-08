@@ -1,0 +1,96 @@
+.my-chats-container {
+  width: 100%;
+  padding: 16px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #f0f0f0;
+}
+
+.my-chats-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.chats-list-container {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.chat-item {
+  background-color: #e8e8e8;
+  color: black;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  padding: 10px;
+}
+
+.chat-item:hover {
+  background-color: #d4d4d4;
+}
+
+.selected-chat {
+  background-color: #38b2ac;
+  color: white;
+}
+
+.selected-chat:hover {
+  background-color: #319795;
+}
+
+.my-chats-container {
+  width: 100%;
+  padding: 16px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #f0f0f0;
+}
+
+.my-chats-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8px; /* Giảm khoảng cách bên dưới tiêu đề */
+}
+
+.chats-list-container {
+  max-height: 400px;
+  overflow-y: auto;
+  padding-top: 0; /* Xóa khoảng cách trên */
+}
+
+.chat-item {
+  background-color: #e8e8e8;
+  color: black;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  padding: 10px;
+}
+
+.chat-item:hover {
+  background-color: #d4d4d4;
+}
+
+.selected-chat {
+  background-color: #38b2ac;
+  color: white;
+}
+
+.selected-chat:hover {
+  background-color: #319795;
+}
+
+.chat-username {
+  color: #0078ff !important; /* Đổi màu và thêm !important để ưu tiên */
+  font-weight: bold;
+}
+
+.text-center {
+  text-align: center !important;
+}

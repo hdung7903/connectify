@@ -1,11 +1,18 @@
-const express = require('express');
+const express = require("express");
 const userRouter = express.Router();
-const { getUser, updateAvatar, updateCover, updateInfo } = require('../controllers/user.controller');
+const {
+  getUser,
+  updateAvatar,
+  updateCover,
+  updateInfo,
+  allUsers,
+} = require("../controllers/user.controller");
+userRouter.get("/getUser", allUsers);
 
-userRouter.get('/:userId', getUser);
-userRouter.patch('/avatar', updateAvatar);
-userRouter.patch('/cover', updateCover);
-userRouter.put('/info', updateInfo);
+userRouter.get("/:userId", getUser);
+userRouter.patch("/avatar", updateAvatar);
+userRouter.patch("/cover", updateCover);
+userRouter.put("/info", updateInfo);
 
 module.exports = userRouter;
 
@@ -71,7 +78,7 @@ module.exports = userRouter;
  *                             type: string
  *       404:
  *         description: User not found
- * 
+ *
  * /users/avatar:
  *   patch:
  *     summary: Update user's avatar
@@ -110,7 +117,7 @@ module.exports = userRouter;
  *         description: Avatar URL is required
  *       404:
  *         description: User not found
- * 
+ *
  * /users/cover:
  *   patch:
  *     summary: Update user's cover photo
@@ -149,7 +156,7 @@ module.exports = userRouter;
  *         description: Cover URL is required
  *       404:
  *         description: User not found
- * 
+ *
  * /users/info:
  *   put:
  *     summary: Update user profile information
