@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Card, Row, Col, Modal, Input, Button, Popover, Typography } from 'antd';
+import { Card, Row, Col, Modal, Input, Button, Popover, Typography, Space } from 'antd';
 import Avatar from '../avatar/Avatar';
 import Reaction from '../interact/Reaction';
 import CommentButton from '../interact/CommentButton';
@@ -249,13 +249,11 @@ export default function Post(props) {
         }
     }
 
-    console.log(state.PostSharedData);
-
     const postActionsMenu = (
-        <div>
+        <Space direction="vertical">
             <button onClick={hidePost} style={{ padding: '8px 0', background: 'none', border: 'none', cursor: 'pointer' }}>Hide Post</button>
             <button onClick={() => alert('Post reported')} style={{ padding: '8px 0', background: 'none', border: 'none', cursor: 'pointer' }}>Report Post</button>
-        </div>
+        </Space>
     );
 
     const postContent = state.hidden ? (

@@ -7,7 +7,7 @@ import {
     HomeOutlined,
 } from '@ant-design/icons';
 import Feed from '../../components/feed/Feed';
-import PostCreate from '../../components/postCreate/postCreate';
+import PostCreate from '../../components/postCreate/PostCreate';
 import './home.css';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -54,7 +54,7 @@ export default function Home() {
                         </Space>
                     </Menu.Item>
                     <Menu.Item key="3" icon={<TeamOutlined />}>Groups</Menu.Item>
-                    <Menu.Item key="4" icon={<MessageOutlined />}>
+                    <Menu.Item key="4" icon={<MessageOutlined />} onClick={()=>navigate("/message")}>
                         Messenger
                     </Menu.Item>
                 </Menu>

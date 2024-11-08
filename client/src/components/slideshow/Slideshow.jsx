@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Modal, Row, Col, Image, Space, Typography, Divider, Button, Card, Popover } from 'antd';
-import { CloseCircleOutlined, GlobalOutlined, LeftOutlined, LockOutlined, RightOutlined, ShareAltOutlined, UsergroupAddOutlined } from '@ant-design/icons';
+import React, { useState, useRef } from 'react';
+import { Modal, Row, Col, Image, Space, Typography, Divider, Button, Card, Popover, Input } from 'antd';
+import { CloseCircleOutlined, GlobalOutlined, LeftOutlined, LockOutlined, RightOutlined, ShareAltOutlined, UsergroupAddOutlined, SendOutlined } from '@ant-design/icons';
 import './slideshow.css';
 import Avatar from '../avatar/Avatar';
 import CommentButton from '../interact/CommentButton';
@@ -11,6 +11,10 @@ export default function Slideshow(props) {
     const [idx, setIdx] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [expanded, setExpanded] = useState(true);
+    const [comments, setComments] = useState([]);
+    const [newComment, setNewComment] = useState('');
+
+    const inputRef = useRef(null);
 
     const handleImageClick = (index) => {
         setIdx(index);
@@ -35,6 +39,17 @@ export default function Slideshow(props) {
     const handleNext = (e) => {
         e.stopPropagation();
         setIdx((prevIdx) => (prevIdx < numImages - 1 ? prevIdx + 1 : 0));
+    };
+
+    const handleCommentChange = (e) => {
+        setNewComment(e.target.value);
+    };
+
+    const handleCommentSubmit = () => {
+        if (newComment.trim()) {
+            setComments([...comments, newComment]);
+            setNewComment('');
+        }
     };
 
     const visibilityIcon = (visibility) => {
@@ -367,8 +382,35 @@ export default function Slideshow(props) {
                                         </Button>
                                     </Space>
                                     <Divider style={{ width: '100%', margin: '3px 0' }} />
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                        <Input
+                                            ref={inputRef}
+                                            value={newComment}
+                                            onChange={handleCommentChange}
+                                            placeholder="Write a comment..."
+                                            style={{ marginTop: '8px', backgroundColor: '#f0f0f0' }}
+                                            suffix={
+                                                <Button
+                                                    type="primary"
+                                                    icon={<SendOutlined />}
+                                                    onClick={handleCommentSubmit}
+                                                />
+                                            }
+                                        />
+                                    </div>
                                 </Card>
                             </Space>
+                            <div style={{ display: 'flex', flexDirection: 'column', marginTop: '20px', marginBottom: '10px' }}>
+                                {comments.map((comment, index) => (
+                                    <div key={index} style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '10px' }}>
+                                        <Avatar imgId={props?.post?.avatarUrl} />
+                                        <div style={{ marginLeft: '10px', backgroundColor: '#f0f0f0', padding: '8px', borderRadius: '12px', maxWidth: '90%' }}>
+                                            <Title level={5} style={{ margin: 0, fontWeight: 'bold', color: '#555' }}>{props?.post?.username}</Title>
+                                            <Text style={{ display: 'block', color: '#333' }}>{comment}</Text>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>

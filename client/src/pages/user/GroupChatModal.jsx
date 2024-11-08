@@ -27,7 +27,11 @@ const GroupChatModal = ({ children }) => {
   const { user } = useAuth();
 
   const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+  const closeModal = () => { 
+    setIsModalOpen(false);
+    setGroupChatName("");
+    setSelectedUsers([])
+  };
 
   const handleGroup = (userToAdd) => {
     if (selectedUsers.includes(userToAdd)) {
@@ -160,6 +164,7 @@ const GroupChatModal = ({ children }) => {
           ) : (
             <List
               itemLayout="horizontal"
+              locale={{ emptyText: null }}
               dataSource={searchResult.slice(0, 4)}
               renderItem={(user) => (
                 <UserListItem

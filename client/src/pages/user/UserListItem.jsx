@@ -5,8 +5,7 @@ import { useAuth } from "../../contexts/AuthContext";
 
 const { Text } = Typography;
 
-const UserListItem = ({ handleFunction }) => {
-  const { user } = useAuth();
+const UserListItem = ({ handleFunction,user }) => {
 
   return (
     <div

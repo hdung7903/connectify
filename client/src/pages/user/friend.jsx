@@ -202,7 +202,7 @@ const AddFriend = () => {
     };
 
     const renderFriendItem = (item) => (
-        <List.Item key={item._id}>
+        <List.Item key={item._id}  locale={{emptyText:null}}>
             <Card style={{ width: '100%', padding: '12px' }}>
                 <Space style={{ display: 'flex' }} >
                     <Avatar

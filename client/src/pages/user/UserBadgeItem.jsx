@@ -1,10 +1,7 @@
 import { Tag } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
-import { useAuth } from "../../contexts/AuthContext";
 
-const UserBadgeItem = ({ handleFunction, admin }) => {
-  const { user } = useAuth();
-
+const UserBadgeItem = ({ user, handleFunction, admin }) => {
   return (
     <Tag
       color={admin === user._id ? "volcano" : "blue"}
@@ -20,7 +17,7 @@ const UserBadgeItem = ({ handleFunction, admin }) => {
         borderRadius: "20px",
       }}
     >
-      {user.username}
+      {user.username} {/* Sử dụng user.username thay vì từ context */}
       {admin === user._id && <span> (Admin)</span>}
       <CloseOutlined style={{ marginLeft: "4px" }} />
     </Tag>

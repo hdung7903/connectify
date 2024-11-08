@@ -46,17 +46,17 @@ const MyChats = () => {
     <div className="my-chats-container">
       <Text className="my-chats-title">My Chats</Text>
       <div className="chats-list-container">
-        {chats && chats.length > 0 && (
+        {chats && chats.length > 0 ? (
           <List
             itemLayout="horizontal"
             dataSource={chats}
             renderItem={(chat) =>
               chat && chat.users ? (
                 <List.Item
+                  locale={{emptyText:null}}
                   onClick={() => setSelectedChat(chat)}
-                  className={`chat-item ${
-                    selectedChat === chat ? "selected-chat" : ""
-                  }`}
+                  className={`chat-item ${selectedChat === chat ? "selected-chat" : ""
+                    }`}
                 >
                   <List.Item.Meta
                     avatar={
@@ -82,8 +82,7 @@ const MyChats = () => {
                             {chat.latestMessage.sender.name}:{" "}
                           </b>
                           {chat.latestMessage.content.length > 50
-                            ? chat.latestMessage.content.substring(0, 51) +
-                              "..."
+                            ? chat.latestMessage.content.substring(0, 51) + "..."
                             : chat.latestMessage.content}
                         </Text>
                       )
@@ -93,7 +92,7 @@ const MyChats = () => {
               ) : null
             }
           />
-        )}
+        ) : null}
       </div>
     </div>
   );

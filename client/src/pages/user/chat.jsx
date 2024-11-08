@@ -151,6 +151,7 @@ function Chat() {
           <Spin />
         ) : (
           <List
+            locale={{emptyText:null}}
             dataSource={Array.isArray(searchResult) ? searchResult : []}
             renderItem={(user) =>
               user && user._id ? (
@@ -169,6 +170,7 @@ function Chat() {
             <List
               itemLayout="horizontal"
               dataSource={chats}
+              locale={{emptyText:null}}
               renderItem={(chat) =>
                 chat && chat.users ? (
                   <List.Item
