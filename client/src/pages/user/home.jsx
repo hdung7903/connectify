@@ -22,8 +22,6 @@ export default function Home() {
     const { user } = useAuth();
     const navigate = useNavigate();
 
-    console.log(user.friends);
-
     const handleNewPost = (post) => {
         setNewPost(post);
         setFeedKey(feedKey + 1);
@@ -84,7 +82,7 @@ export default function Home() {
                     {user.friends.map(friend => (
                         <Menu.Item key={friend._id}>
                             <Space onClick={() => navigate(`/profile/${friend._id}`)}>
-                                <Avatar src={(friend.avatarUrl && friend.avatarUrl !== "") ? friend.avatarUrl : "http://placeholder.co/160x160"} alt="avatar" />
+                                <Avatar imgId={friend.avatarUrl} icon={<UserOutlined />} alt="avatar" />
                                 {friend.username}
                             </Space>
                         </Menu.Item>

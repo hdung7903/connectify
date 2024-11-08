@@ -9,14 +9,14 @@ import SharePost from '../postCreate/sharePost';
 import { ShareAltOutlined, SendOutlined, MoreOutlined, UndoOutlined, UsergroupAddOutlined, LockOutlined, GlobalOutlined } from '@ant-design/icons';
 import './post.css';
 import api from '../../services/axios';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import FormattedContent from './FormattedContent';
 
 const { Text, Paragraph } = Typography;
 
 export default function Post(props) {
     const { id, ownerId, title, avatarUrl, content, media, reactsCount, reactions, visibility, createdAt, updatedAt, username, comments, sharesCount, refreshPosts, sharedPostId } = props;
-    const navigate = useNavigate();
     const { user } = useAuth();
     const userId = user._id;
 
@@ -24,7 +24,7 @@ export default function Post(props) {
         ...props,
         showComments: false,
         commentsLoaded: false,
-        comments: props.comments || [],
+        comments: comments || [],
         newComment: '',
         showModal: false,
         hidden: false,
@@ -74,10 +74,12 @@ export default function Post(props) {
                         },
                     });
 
+
                     setState(prevState => ({
                         ...prevState,
                         PostSharedData,
                         ownerPostSharedData: {
+                            id: ownerResponse.data._id,
                             avatarUrl: ownerResponse.data.avatarUrl || 'https://placeholder.co/40x40',
                             username: ownerResponse.data.username || 'Unknown User',
                         },
@@ -209,13 +211,15 @@ export default function Post(props) {
         const createdTime = new Date(time).getTime();
         const diffInSeconds = Math.floor((now - createdTime) / 1000);
 
+        const getTimeString = (value, unit) => `${Math.floor(value)} ${unit}${value === 1 ? '' : 's'}`;
+
         if (diffInSeconds < 60) return "Just now";
-        if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minute${diffInSeconds === 60 ? '' : 's'}`;
-        if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hour${diffInSeconds / 3600 === 1 ? '' : 's'}`;
-        if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} day${diffInSeconds / 86400 === 1 ? '' : 's'}`;
-        if (diffInSeconds < 2419200) return `${Math.floor(diffInSeconds / 604800)} week${diffInSeconds / 604800 === 1 ? '' : 's'}`;
-        if (diffInSeconds < 29030400) return `${Math.floor(diffInSeconds / 2419200)} month${diffInSeconds / 2419200 === 1 ? '' : 's'}`;
-        return `${Math.floor(diffInSeconds / 29030400)} year${diffInSeconds / 29030400 === 1 ? '' : 's'} ago`;
+        if (diffInSeconds < 3600) return getTimeString(diffInSeconds / 60, 'minute');
+        if (diffInSeconds < 86400) return getTimeString(diffInSeconds / 3600, 'hour');
+        if (diffInSeconds < 604800) return getTimeString(diffInSeconds / 86400, 'day');
+        if (diffInSeconds < 2419200) return getTimeString(diffInSeconds / 604800, 'week');
+        if (diffInSeconds < 29030400) return getTimeString(diffInSeconds / 2419200, 'month');
+        return getTimeString(diffInSeconds / 29030400, 'year') + ' ago';
     }
 
     function hidePost() {
@@ -247,8 +251,8 @@ export default function Post(props) {
 
     const postActionsMenu = (
         <div>
-            <div onClick={hidePost} style={{ padding: '8px 0' }}>Hide Post</div>
-            <div onClick={() => alert('Post reported')} style={{ padding: '8px 0' }}>Report Post</div>
+            <button onClick={hidePost} style={{ padding: '8px 0', background: 'none', border: 'none', cursor: 'pointer' }}>Hide Post</button>
+            <button onClick={() => alert('Post reported')} style={{ padding: '8px 0', background: 'none', border: 'none', cursor: 'pointer' }}>Report Post</button>
         </div>
     );
 
@@ -266,10 +270,12 @@ export default function Post(props) {
                     <Col style={{ display: 'flex', alignItems: 'center' }}>
                         <Avatar imgId={avatarUrl || 'https://placeholder.co/40x40'} />
                         <div style={{ marginLeft: '8px' }}>
-                            <Text strong><Link to={`/profile/${ownerId}`} className="profile-link">
-                                {username}
-                            </Link></Text>
-                            <Text type="secondary" style={{ display: 'block' }}>{parseDateTime(createdAt)}{visibilityIcon(visibility)}</Text>
+                            <Text strong>
+                                <Link to={`/profile/${ownerId}`} className="profile-link">
+                                    {username}
+                                </Link>
+                            </Text>
+                            <Text type="secondary" style={{ display: 'block' }}>{parseDateTime(createdAt)}&nbsp;{visibilityIcon(visibility)}</Text>
                         </div>
                     </Col>
                 </Row>
@@ -280,19 +286,26 @@ export default function Post(props) {
             <div className="post-split"></div>
             <Row>
                 <Col span={24}>
-                    <Paragraph ellipsis={{ rows: expanded ? 2 : undefined, expandable: false }}>
-                        {content}
-                    </Paragraph>
-                    {content.length > 100 && (
-                        <Text
-                            type="secondary"
-                            style={{ cursor: 'pointer', color: '#1890ff' }}
-                            onClick={() => setExpanded(!expanded)}
-                        >
-                            {expanded ? 'Show more' : 'Show less'}
-                        </Text>
+
+                    <div>
+                        <div className={`content-container ${expanded ? 'truncated' : ''}`}>
+                            <FormattedContent content={content} hasMedia={Array.isArray(media) && media.length > 0} />
+                        </div>                      
+                    </div>
+                    {(Array.isArray(media) && media.length > 0) && (
+                        <Slideshow
+                            images={media.map(item => ({
+                                url: item.url,
+                                content: item.content
+                            }))}
+                            post={{
+                                avatarUrl: avatarUrl,
+                                username: username,
+                                visibility: visibility,
+                                parseDateTime: parseDateTime(createdAt),
+                            }}
+                        />
                     )}
-                    {Array.isArray(media) && media.length > 0 && <Slideshow images={media.map(item => item.url)} />}
                     <div className="post-split"></div>
                     {title === 'Post share' && state.PostSharedData && !state.isLoadingSharedData && (
                         <div className="shared-post">
@@ -301,7 +314,11 @@ export default function Post(props) {
                                 <Row align="middle">
                                     <Avatar imgId={state.ownerPostSharedData.avatarUrl || 'https://placeholder.co/40x40'} />
                                     <div style={{ marginLeft: '8px' }}>
-                                        <Text strong>{state.ownerPostSharedData.username}</Text>
+                                        <Text strong>
+                                            <Link to={`/profile/${state.ownerPostSharedData.id}`} className="profile-link">
+                                                {state.ownerPostSharedData.username}
+                                            </Link>
+                                        </Text>
                                     </div>
                                 </Row>
                                 <Paragraph>{state.PostSharedData.content}</Paragraph>
@@ -312,26 +329,26 @@ export default function Post(props) {
                 </Col>
             </Row>
             <div className="post-stats">
-                <div className="post-stats-left">{reactsCount} reactions</div>
-                <div className="post-stats-right">{state.comments.length} comments</div>
+                <div className="post-stats-left">{reactsCount > 1 ? `${reactsCount} reactions` : `${reactsCount} reaction`}</div>
+                <div className="post-stats-right">{state.comments.length > 1 ? `${state.comments.length} comments` : `${state.comments.length} comment`}</div>
             </div>
             <div className="post-split"></div>
             <div className="post-actions">
                 <Reaction onReaction={handleReaction} selectedReaction={state.selectedReaction} />
-                <span onClick={focusCommentInput} className="comment-button">
+                <Button onClick={focusCommentInput} className="comment-button" type='text'>
                     <CommentButton>Comment</CommentButton>
-                </span>
-                <span className="share-button" onClick={handleShareClick}>
+                </Button>
+                <Button className="share-button" onClick={handleShareClick} type='text'>
                     <ShareAltOutlined />
                     Share
-                </span>
+                </Button>
             </div>
             <div className="post-split"></div>
             <div>
                 {state.comments.length > 2 && (
-                    <div className="view-all-comments" onClick={showAllComments}>
+                    <Button className="view-all-comments" onClick={showAllComments} type="text">
                         View all comments
-                    </div>
+                    </Button>
                 )}
                 {state.comments.length > 0 ? (
                     <Comments comments={state.comments.slice(0, 2)} postId={id} />
@@ -389,13 +406,13 @@ export default function Post(props) {
                 <div className="post-split"></div>
                 <Paragraph>{content}</Paragraph>
                 <div className="post-split"></div>
-                {Array.isArray(media) && media.length > 0 && <Slideshow images={media.map(item => item.url)} />}
+                {Array.isArray(media) && media.length > 0 && <Slideshow images={media.map(item => { item.url, item.content })} />}
                 <div className="post-split"></div>
                 <div className="post-actions">
                     <Reaction onReaction={handleReaction} reactions={reactions} />
-                    <span onClick={focusCommentInput} className="comment-button">
+                    <Button onClick={focusCommentInput} className="comment-button" type='text'>
                         <CommentButton>Comment</CommentButton>
-                    </span>
+                    </Button>
                     <span className="share-button">
                         <ShareAltOutlined />
                         Share
