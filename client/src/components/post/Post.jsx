@@ -249,6 +249,8 @@ export default function Post(props) {
         }
     }
 
+    console.log(state.PostSharedData);
+
     const postActionsMenu = (
         <div>
             <button onClick={hidePost} style={{ padding: '8px 0', background: 'none', border: 'none', cursor: 'pointer' }}>Hide Post</button>
@@ -290,7 +292,7 @@ export default function Post(props) {
                     <div>
                         <div className={`content-container ${expanded ? 'truncated' : ''}`}>
                             <FormattedContent content={content} hasMedia={Array.isArray(media) && media.length > 0} />
-                        </div>                      
+                        </div>
                     </div>
                     {(Array.isArray(media) && media.length > 0) && (
                         <Slideshow
@@ -308,7 +310,7 @@ export default function Post(props) {
                     )}
                     <div className="post-split"></div>
                     {title === 'Post share' && state.PostSharedData && !state.isLoadingSharedData && (
-                        <div className="shared-post">
+                        <div className="shared-post" style={{padding:"0 20px"}}>
                             <Paragraph>{state.shareMessage}</Paragraph>
                             <div className="shared-post-content">
                                 <Row align="middle">
@@ -322,7 +324,20 @@ export default function Post(props) {
                                     </div>
                                 </Row>
                                 <Paragraph>{state.PostSharedData.content}</Paragraph>
-                                {Array.isArray(state.PostSharedData.media) && state.PostSharedData.media.length > 0 && <Slideshow images={state.PostSharedData.media.map(item => item.url)} />}
+                                {Array.isArray(state.PostSharedData.media) && state.PostSharedData.media.length > 0 &&
+                                    <Slideshow 
+                                    images={state.PostSharedData.media.map(item => ({
+                                        url: item.url,
+                                        content: item.content
+                                    }))}
+                                    post={{
+                                        avatarUrl: state.ownerPostSharedData.avatarUrl,
+                                        username: state.ownerPostSharedData.username,
+                                        visibility: state.PostSharedData.visibility,
+                                        parseDateTime: parseDateTime(state.PostSharedData.createdAt),
+                                    }}
+                                    />
+                                }
                             </div>
                         </div>
                     )}

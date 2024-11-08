@@ -8,7 +8,6 @@ import api from '../../services/axios';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { storage } from '../../firebase/config';
 import { useAuth } from '../../contexts/AuthContext';
-import { formatContent } from '../../utils/linkFormatter';
 
 const VISIBILITY_OPTIONS = {
     PUBLIC: 'public',

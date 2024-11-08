@@ -22,7 +22,7 @@ export default function SharePost({ showShareModal, closeShareModal, postId, ref
             });
             await api.post('/posts/', {
                 title: 'Post share',
-                content: shareMessage || 'Check out this post!',
+                content: shareMessage || null,
                 sharedPostId: postId,
                 visibility: 'public'
             }, {

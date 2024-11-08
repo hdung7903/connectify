@@ -51,6 +51,46 @@ app.set('view engine', 'ejs');
 
 const io = initializeSocket(server);
 
+io.on("connection", (socket) => {
+    console.log(`New client connected with socket ID: ${socket.id}`);
+
+    socket.on("setup", (userData) => {
+        console.log("Setup received with userData:", userData);
+        socket.join(userData._id);
+        socket.emit("connected");
+        console.log(`User ${userData._id} has joined their personal room`);
+    });
+
+    socket.on("join chat", (room) => {
+        console.log(`User with socket ID ${socket.id} joining Room: ${room}`);
+        socket.join(room);
+        console.log(`User joined room ${room}`);
+    });
+
+    socket.on("new message", (newMessageReceived) => {
+        let chat = newMessageReceived.chat;
+        if (!chat || !chat.users) {
+            console.log("chat.users not defined");
+            return;
+        }
+
+        console.log(
+            `New message received from ${newMessageReceived.sender._id} in chat ${chat._id}:`,
+            newMessageReceived.content
+        );
+
+        chat.users.forEach((user) => {
+            if (user._id === newMessageReceived.sender._id) return;
+            console.log(`Emitting message to user: ${user._id} in room: ${user._id}`);
+            socket.to(user._id).emit("message received", newMessageReceived);
+        });
+    });
+
+    socket.on("disconnect", () => {
+        console.log(`Socket ID ${socket.id} disconnected`);
+    });
+});
+
 connectDB();
 
 app.get('/', (req, res) => {
