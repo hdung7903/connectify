@@ -55,7 +55,7 @@ const { Schema } = mongoose;
  *           format: date-time
  */
 
-const chatSchema = new Schema(
+const chatModel = mongoose.Schema(
   {
     chatName: { type: String, trim: true },
     isGroupChat: { type: Boolean, default: false },
@@ -69,6 +69,6 @@ const chatSchema = new Schema(
   { timestamps: true }
 );
 
-const Chat = mongoose.model("Chat", chatSchema);
+const Chat = mongoose.model("Chat", chatModel);
 
 module.exports = Chat;

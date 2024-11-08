@@ -9,7 +9,7 @@ const Chat = require("../models/chat.model");
 const allMessages = asyncHandler(async (req, res) => {
   try {
     const messages = await Message.find({ chat: req.params.chatId })
-      .populate("sender", "name pic email")
+      .populate("sender", "username avatarUrl email")
       .populate("chat");
     res.json(messages);
   } catch (error) {
@@ -31,28 +31,25 @@ const sendMessage = asyncHandler(async (req, res) => {
   }
 
   const newMessage = {
-    sender: req.user._id,
+    sender: req.user.userId,
     content: content,
     chat: chatId,
   };
+  console.log("User: ", req.user);
+
+  console.log("User ID: ", req.user.userId);
 
   try {
     let message = await Message.create(newMessage);
-
-    // Dùng populate trên truy vấn findOne để tránh lỗi
     message = await Message.findById(message._id)
-      .populate("sender", "name pic")
-      .populate("chat")
-      .populate({
-        path: "chat.users",
-        select: "name pic email",
-      });
+      .populate("sender", "username avatarUrl")
+      .populate("chat");
 
-    await Chat.findByIdAndUpdate(chatId, { latestMessage: message });
+    await Chat.findByIdAndUpdate(req.body.chatId, {
+      latestMessage: message,
+    });
 
-    res
-      .status(201)
-      .json({ message: "Message sent successfully", data: message });
+    res.status(201).json(message);
   } catch (error) {
     res
       .status(500)
